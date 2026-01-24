@@ -2,13 +2,22 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from "@/components/ui/breadcrumb";
 import { ArrowLeft, AlertCircle } from "lucide-react";
 import { WeekList } from "@/components/lecture-content/week-list";
 import { ProgressIndicator } from "@/components/lecture-content/progress-indicator";
-import { lectureContentApi } from "@/lib/api-client";
-import type { CourseContentWithProgress } from "@/lib/api-types";
+import { lectureContentApi, coursesApi } from "@/lib/api-client";
+import type { CourseContentWithProgress, Course } from "@/lib/api-types";
 import { toast } from "sonner";
 
 export default function StudentCourseContentPage() {
@@ -17,6 +26,7 @@ export default function StudentCourseContentPage() {
   const courseId = parseInt(params.id as string, 10);
 
   const [content, setContent] = useState<CourseContentWithProgress | null>(null);
+  const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,8 +34,12 @@ export default function StudentCourseContentPage() {
     try {
       setLoading(true);
       setError(null);
-      const data = await lectureContentApi.getCourseContent(courseId);
-      setContent(data);
+      const [contentData, courseData] = await Promise.all([
+        lectureContentApi.getCourseContent(courseId),
+        coursesApi.list().then((courses) => courses.find((c) => c.id === courseId) || null),
+      ]);
+      setContent(contentData);
+      setCourse(courseData);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to load content";
       setError(message);
@@ -133,9 +147,33 @@ export default function StudentCourseContentPage() {
           </Button>
         </div>
 
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/">Dashboard</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/courses">Courses</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>
+                {course ? `${course.courseCode} - ${course.courseName}` : "Course Content"}
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Course Content</CardTitle>
+            <CardTitle className="text-2xl">
+              {course ? `${course.courseCode}: ${course.courseName}` : "Course Content"}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <ProgressIndicator completed={completedItems} total={totalItems} />

@@ -10,6 +10,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, Trash2, Eye, EyeOff, ChevronUp, ChevronDown } from "lucide-react";
 import { WeekForm } from "./week-form";
@@ -31,6 +41,8 @@ export function ContentManager({ courseId }: ContentManagerProps) {
   const [editingWeek, setEditingWeek] = useState<Week | null>(null);
   const [editingContent, setEditingContent] = useState<LectureContent | null>(null);
   const [loading, setLoading] = useState(true);
+  const [weekToDelete, setWeekToDelete] = useState<number | null>(null);
+  const [contentToDelete, setContentToDelete] = useState<number | null>(null);
 
   const loadWeeks = async () => {
     try {
@@ -92,8 +104,6 @@ export function ContentManager({ courseId }: ContentManagerProps) {
   };
 
   const handleDeleteWeek = async (weekId: number) => {
-    if (!confirm("Are you sure you want to delete this week? All content will be removed."))
-      return;
     try {
       await lectureContentApi.deleteWeek(courseId, weekId);
       toast.success("Week deleted successfully");
@@ -101,8 +111,10 @@ export function ContentManager({ courseId }: ContentManagerProps) {
       if (selectedWeek?.id === weekId) {
         setSelectedWeek(null);
       }
+      setWeekToDelete(null);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to delete week");
+      setWeekToDelete(null);
     }
   };
 
@@ -146,13 +158,14 @@ export function ContentManager({ courseId }: ContentManagerProps) {
   };
 
   const handleDeleteContent = async (contentId: number) => {
-    if (!confirm("Are you sure you want to delete this content item?")) return;
     try {
       await lectureContentApi.deleteContent(contentId);
       toast.success("Content deleted successfully");
       if (selectedWeek) loadWeekContent(selectedWeek.id);
+      setContentToDelete(null);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to delete content");
+      setContentToDelete(null);
     }
   };
 
@@ -261,7 +274,7 @@ export function ContentManager({ courseId }: ContentManagerProps) {
                         size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleDeleteWeek(week.id);
+                          setWeekToDelete(week.id);
                         }}
                       >
                         <Trash2 className="h-4 w-4" />
@@ -343,7 +356,7 @@ export function ContentManager({ courseId }: ContentManagerProps) {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDeleteContent(content.id)}
+                        onClick={() => setContentToDelete(content.id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -374,6 +387,7 @@ export function ContentManager({ courseId }: ContentManagerProps) {
             </DialogDescription>
           </DialogHeader>
           <WeekForm
+            courseId={courseId}
             initialData={editingWeek || undefined}
             onSubmit={editingWeek ? handleUpdateWeek : handleCreateWeek}
             onCancel={() => {
@@ -414,6 +428,54 @@ export function ContentManager({ courseId }: ContentManagerProps) {
           />
         </DialogContent>
       </Dialog>
+
+      {/* Delete Week Confirmation */}
+      <AlertDialog
+        open={weekToDelete !== null}
+        onOpenChange={(open) => !open && setWeekToDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Week</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this week? All content items in this week will be permanently removed. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => weekToDelete && handleDeleteWeek(weekToDelete)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Content Confirmation */}
+      <AlertDialog
+        open={contentToDelete !== null}
+        onOpenChange={(open) => !open && setContentToDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Content</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this content item? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => contentToDelete && handleDeleteContent(contentToDelete)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

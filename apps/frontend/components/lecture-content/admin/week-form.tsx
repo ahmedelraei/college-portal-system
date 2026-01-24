@@ -31,12 +31,18 @@ type WeekFormData = z.infer<typeof weekSchema>;
 
 interface WeekFormProps {
   courseId: number;
-  week?: Week;
-  onSuccess: () => void;
+  initialData?: Week;
+  onSubmit: (data: {
+    weekNumber: number;
+    title: string;
+    description?: string;
+    isPublished?: boolean;
+  }) => Promise<void>;
   onCancel: () => void;
 }
 
-export function WeekForm({ courseId, week, onSuccess, onCancel }: WeekFormProps) {
+export function WeekForm({ courseId, initialData, onSubmit, onCancel }: WeekFormProps) {
+  const week = initialData;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isEditing = !!week;
 
@@ -58,28 +64,19 @@ export function WeekForm({ courseId, week, onSuccess, onCancel }: WeekFormProps)
 
   const isPublished = watch("isPublished");
 
-  const onSubmit = async (data: WeekFormData) => {
+  const onFormSubmit = async (data: WeekFormData) => {
     setIsSubmitting(true);
     try {
-      if (isEditing && week) {
-        await lectureContentApi.updateWeek(courseId, week.id, data);
-        toast.success("Week updated successfully");
-      } else {
-        await lectureContentApi.createWeek(courseId, data);
-        toast.success("Week created successfully");
-      }
-      onSuccess();
+      await onSubmit(data);
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to save week",
-      );
+      // Error handling is done in parent component
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="weekNumber">Week Number *</Label>
         <Input

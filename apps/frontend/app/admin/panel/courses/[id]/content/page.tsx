@@ -1,14 +1,39 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from "@/components/ui/breadcrumb";
 import { ArrowLeft } from "lucide-react";
 import { ContentManager } from "@/components/lecture-content/admin/content-manager";
+import { coursesApi } from "@/lib/api-client";
+import type { Course } from "@/lib/api-types";
 
 export default function AdminCourseContentPage() {
   const router = useRouter();
   const params = useParams();
   const courseId = parseInt(params.id as string, 10);
+  const [course, setCourse] = useState<Course | null>(null);
+
+  useEffect(() => {
+    coursesApi
+      .list()
+      .then((courses) => {
+        const found = courses.find((c) => c.id === courseId);
+        setCourse(found || null);
+      })
+      .catch(() => {
+        // Ignore error, course name is optional
+      });
+  }, [courseId]);
 
   return (
     <div className="min-h-screen bg-background p-8">
@@ -22,8 +47,33 @@ export default function AdminCourseContentPage() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Admin Panel
           </Button>
-          <h1 className="text-3xl font-bold">Manage Course Content</h1>
         </div>
+
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/admin/panel">Admin Panel</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/admin/panel">Courses</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>
+                {course ? `${course.courseCode} - Content` : "Manage Content"}
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
+        <h1 className="text-3xl font-bold">
+          {course ? `${course.courseCode}: ${course.courseName}` : "Manage Course Content"}
+        </h1>
 
         <ContentManager courseId={courseId} />
       </div>
