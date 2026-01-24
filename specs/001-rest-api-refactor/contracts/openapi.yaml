@@ -1,0 +1,1112 @@
+openapi: 3.1.0
+info:
+  title: College Portal REST API
+  version: 1.0.0
+  description: REST API contracts for the GraphQL-to-REST migration.
+servers:
+  - url: http://localhost:8080/api
+tags:
+  - name: auth
+  - name: courses
+  - name: registrations
+  - name: payments
+  - name: students
+  - name: system-settings
+
+paths:
+  /auth/login:
+    post:
+      tags: [auth]
+      summary: Login and receive JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/register:
+    post:
+      tags: [auth]
+      summary: Register a student user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /auth/admin/register:
+    post:
+      tags: [auth]
+      summary: Register an admin user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /auth/profile:
+    get:
+      tags: [auth]
+      summary: Get current user profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/logout:
+    post:
+      tags: [auth]
+      summary: Logout (client clears JWT)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+
+  /courses:
+    get:
+      tags: [courses]
+      summary: List courses
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: semester
+          schema: { type: string }
+        - in: query
+          name: isActive
+          schema: { type: boolean }
+        - in: query
+          name: search
+          schema: { type: string }
+      responses:
+        '200':
+          description: Courses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'
+    post:
+      tags: [courses]
+      summary: Create course (admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCourseRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /courses/{id}:
+    get:
+      tags: [courses]
+      summary: Get course by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Course
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [courses]
+      summary: Update course (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCourseRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+    delete:
+      tags: [courses]
+      summary: Delete course (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+
+  /courses/code/{courseCode}:
+    get:
+      tags: [courses]
+      summary: Get course by code
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: courseCode
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Course
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+
+  /courses/{id}/statistics:
+    get:
+      tags: [courses]
+      summary: Get course statistics
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Statistics
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /courses/{id}/prerequisites/check:
+    get:
+      tags: [courses]
+      summary: Check prerequisites for a course
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Prerequisite status
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /registrations:
+    get:
+      tags: [registrations]
+      summary: List registrations (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: studentId
+          schema: { type: integer }
+        - in: query
+          name: semester
+          schema: { type: string }
+        - in: query
+          name: year
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Registrations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Registration'
+    post:
+      tags: [registrations]
+      summary: Register for a course
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRegistrationRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Registration'
+
+  /registrations/bulk:
+    post:
+      tags: [registrations]
+      summary: Bulk registration
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkRegistrationRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Registration'
+
+  /registrations/me:
+    get:
+      tags: [registrations]
+      summary: Get my registrations
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: semester
+          schema: { type: string }
+        - in: query
+          name: year
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Registrations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Registration'
+
+  /registrations/me/summary:
+    get:
+      tags: [registrations]
+      summary: Get my registration summary
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: semester
+          required: true
+          schema: { type: string }
+        - in: query
+          name: year
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Summary
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /registrations/{id}:
+    get:
+      tags: [registrations]
+      summary: Get registration by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Registration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Registration'
+    patch:
+      tags: [registrations]
+      summary: Update registration (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRegistrationRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Registration'
+
+  /registrations/{id}/payment-status:
+    patch:
+      tags: [registrations]
+      summary: Update payment status
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                paymentStatus:
+                  type: string
+                  enum: [pending, paid, failed, refunded]
+              required: [paymentStatus]
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Registration'
+
+  /registrations/{id}/drop:
+    delete:
+      tags: [registrations]
+      summary: Drop a course
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Dropped
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+
+  /payments:
+    get:
+      tags: [payments]
+      summary: List payments (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: studentId
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Payments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
+    post:
+      tags: [payments]
+      summary: Create payment
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+
+  /payments/{id}/process:
+    post:
+      tags: [payments]
+      summary: Process payment
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessPaymentRequest'
+      responses:
+        '200':
+          description: Processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+
+  /payments/me:
+    get:
+      tags: [payments]
+      summary: Get my payments
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Payments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
+
+  /payments/me/history:
+    get:
+      tags: [payments]
+      summary: Get my payment history
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Payment history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
+
+  /payments/{id}:
+    get:
+      tags: [payments]
+      summary: Get payment by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Payment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+
+  /payments/{id}/refund:
+    patch:
+      tags: [payments]
+      summary: Refund payment (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+              required: [reason]
+      responses:
+        '200':
+          description: Refunded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+
+  /students:
+    get:
+      tags: [students]
+      summary: List students (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Students
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Student'
+
+  /students/me:
+    get:
+      tags: [students]
+      summary: Get my student profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Student
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+    patch:
+      tags: [students]
+      summary: Update my profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStudentRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+
+  /students/me/transcript:
+    get:
+      tags: [students]
+      summary: Get my transcript
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Transcript
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /students/me/statistics:
+    get:
+      tags: [students]
+      summary: Get my statistics
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Statistics
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /students/me/gpa:
+    get:
+      tags: [students]
+      summary: Get my semester GPA
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: semester
+          required: true
+          schema: { type: string }
+        - in: query
+          name: year
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: GPA
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /students/{id}:
+    get:
+      tags: [students]
+      summary: Get student by ID (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Student
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+    patch:
+      tags: [students]
+      summary: Update student (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStudentRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+    delete:
+      tags: [students]
+      summary: Delete student (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+
+  /students/{id}/transcript:
+    get:
+      tags: [students]
+      summary: Get transcript (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Transcript
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /students/{id}/statistics:
+    get:
+      tags: [students]
+      summary: Get statistics (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Statistics
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /system-settings/registration-enabled:
+    get:
+      tags: [system-settings]
+      summary: Check if registration is enabled
+      responses:
+        '200':
+          description: Enabled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+
+  /system-settings:
+    get:
+      tags: [system-settings]
+      summary: List settings (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Settings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SystemSettings'
+    patch:
+      tags: [system-settings]
+      summary: Update a system setting (admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSystemSettingRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemSettings'
+
+  /system-settings/registration:
+    patch:
+      tags: [system-settings]
+      summary: Toggle registration enabled (admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+              required: [enabled]
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemSettings'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        statusCode: { type: integer }
+        error: { type: string }
+        message: { type: string }
+      required: [statusCode, error, message]
+    MessageResponse:
+      type: object
+      properties:
+        message: { type: string }
+      required: [message]
+    LoginRequest:
+      type: object
+      properties:
+        studentId: { type: string }
+        password: { type: string }
+      required: [studentId, password]
+    LoginResponse:
+      type: object
+      properties:
+        token: { type: string }
+        user:
+          $ref: '#/components/schemas/User'
+      required: [token, user]
+    RegisterRequest:
+      type: object
+      properties:
+        studentId: { type: string }
+        email: { type: string }
+        password: { type: string }
+        firstName: { type: string }
+        lastName: { type: string }
+      required: [studentId, email, password, firstName, lastName]
+    User:
+      type: object
+      properties:
+        id: { type: integer }
+        email: { type: string }
+        firstName: { type: string }
+        lastName: { type: string }
+        role: { type: string, enum: [student, admin] }
+        isActive: { type: boolean }
+        fullName: { type: string }
+        studentId: { type: integer, nullable: true }
+        currentGPA: { type: number, nullable: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    Student:
+      type: object
+      properties:
+        id: { type: integer }
+        studentId: { type: integer }
+        currentGPA: { type: number }
+        userId: { type: integer }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        firstName: { type: string }
+        lastName: { type: string }
+        email: { type: string }
+        fullName: { type: string }
+        isActive: { type: boolean }
+        role: { type: string }
+    Course:
+      type: object
+      properties:
+        id: { type: integer }
+        courseCode: { type: string }
+        courseName: { type: string }
+        description: { type: string }
+        creditHours: { type: integer }
+        pricePerCredit: { type: number }
+        semester: { type: string, enum: [summer, winter] }
+        isActive: { type: boolean }
+        totalCost: { type: number }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    Registration:
+      type: object
+      properties:
+        id: { type: integer }
+        studentId: { type: integer }
+        courseId: { type: integer }
+        semester: { type: string }
+        year: { type: integer }
+        paymentStatus: { type: string, enum: [pending, paid, failed, refunded] }
+        grade: { type: string, enum: [A, B, C, D, F, I, W], nullable: true }
+        gradePoints: { type: number, nullable: true }
+        isCompleted: { type: boolean }
+        isDropped: { type: boolean }
+        droppedAt: { type: string, format: date-time, nullable: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    Payment:
+      type: object
+      properties:
+        id: { type: integer }
+        studentId: { type: integer }
+        amount: { type: number }
+        type: { type: string, enum: [tuition, refund] }
+        method: { type: string, enum: [credit_card, debit_card, bank_transfer] }
+        status:
+          type: string
+          enum: [pending, processing, completed, failed, cancelled, refunded]
+        transactionId: { type: string, nullable: true }
+        description: { type: string, nullable: true }
+        metadata: { type: object, nullable: true }
+        failureReason: { type: string, nullable: true }
+        processedAt: { type: string, format: date-time, nullable: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    SystemSettings:
+      type: object
+      properties:
+        id: { type: integer }
+        settingKey: { type: string }
+        settingValue: { type: string }
+        description: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    CreateCourseRequest:
+      type: object
+      properties:
+        courseCode: { type: string }
+        courseName: { type: string }
+        description: { type: string }
+        creditHours: { type: integer }
+        pricePerCredit: { type: number }
+        semester: { type: string, enum: [summer, winter] }
+        isActive: { type: boolean }
+        prerequisiteIds:
+          type: array
+          items: { type: integer }
+      required: [courseCode, courseName, description, creditHours, semester]
+    UpdateCourseRequest:
+      type: object
+      properties:
+        courseCode: { type: string }
+        courseName: { type: string }
+        description: { type: string }
+        creditHours: { type: integer }
+        pricePerCredit: { type: number }
+        semester: { type: string, enum: [summer, winter] }
+        isActive: { type: boolean }
+        prerequisiteIds:
+          type: array
+          items: { type: integer }
+    CreateRegistrationRequest:
+      type: object
+      properties:
+        studentId: { type: integer }
+        courseId: { type: integer }
+        semester: { type: string }
+        year: { type: integer }
+      required: [courseId, semester, year]
+    BulkRegistrationRequest:
+      type: object
+      properties:
+        studentId: { type: integer }
+        courseIds:
+          type: array
+          items: { type: integer }
+        semester: { type: string }
+        year: { type: integer }
+      required: [courseIds, semester, year]
+    UpdateRegistrationRequest:
+      type: object
+      properties:
+        paymentStatus: { type: string }
+        grade: { type: string }
+        isCompleted: { type: boolean }
+        isDropped: { type: boolean }
+        droppedAt: { type: string, format: date-time }
+    CreatePaymentRequest:
+      type: object
+      properties:
+        studentId: { type: integer }
+        amount: { type: number }
+        type: { type: string, enum: [tuition, refund] }
+        method: { type: string, enum: [credit_card, debit_card, bank_transfer] }
+        description: { type: string }
+        metadata: { type: object }
+      required: [amount, type, method]
+    ProcessPaymentRequest:
+      type: object
+      properties:
+        paymentMethod: { type: string }
+        cardNumber: { type: string }
+        expiryMonth: { type: string }
+        expiryYear: { type: string }
+        cvv: { type: string }
+      required: [paymentMethod]
+    UpdateStudentRequest:
+      type: object
+      properties:
+        currentGPA: { type: number }
+        isActive: { type: boolean }
+    UpdateSystemSettingRequest:
+      type: object
+      properties:
+        settingKey: { type: string }
+        settingValue: { type: string }
+      required: [settingKey, settingValue]

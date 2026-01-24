@@ -1,0 +1,35 @@
+# college-portal-system Development Guidelines
+
+Auto-generated from all feature plans. Last updated: 2026-01-16
+
+## Active Technologies
+- TypeScript 5.9+, Node.js 22 LTS + NestJS 11, TypeORM 0.3, Next.js 15, Fastify, class-validator (002-lecture-content-lms)
+- PostgreSQL (existing), Local filesystem for uploads (upgradable to S3) (002-lecture-content-lms)
+- TypeScript 5.9+, Node.js 22 LTS + NestJS 11, TypeORM 0.3, Next.js 15 (App Router), Fastify, class-validator (002-academic-reports)
+- PostgreSQL (reuse students, courses, registrations with grade/gradePoints) (002-academic-reports)
+
+- TypeScript 5.9, Node.js >=22 + NestJS 11, Fastify, TypeORM, PostgreSQL, Redis (optional for sessions), Next.js 15, React 19, Tailwind CSS, pnpm, Turborepo (001-rest-api-refactor)
+
+## Project Structure
+
+```text
+src/
+tests/
+```
+
+## Commands
+
+npm test && npm run lint
+
+## Code Style
+
+TypeScript 5.9, Node.js >=22: Follow standard conventions
+
+## Recent Changes
+- 002-academic-reports: Added TypeScript 5.9+, Node.js 22 LTS + NestJS 11, TypeORM 0.3, Next.js 15 (App Router), Fastify, class-validator
+- 001-academic-reports: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
+- 002-lecture-content-lms: Added TypeScript 5.9+, Node.js 22 LTS + NestJS 11, TypeORM 0.3, Next.js 15, Fastify, class-validator
+
+
+<!-- MANUAL ADDITIONS START -->
+<!-- MANUAL ADDITIONS END -->

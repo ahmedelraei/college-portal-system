@@ -1,0 +1,518 @@
+{
+  "name": "Modern Design System",
+  "version": "2.0.0",
+  "description": "Design system for college portal with modern, clean aesthetic",
+  "theme": "modern",
+
+  "colors": {
+    "primary": {
+      "name": "Modern Blue",
+      "value": "#3b82f6",
+      "hex": "#3b82f6",
+      "description": "Primary brand color - modern blue"
+    },
+    "primaryForeground": {
+      "name": "White",
+      "value": "#ffffff",
+      "hex": "#ffffff"
+    },
+    "secondary": {
+      "name": "Violet",
+      "value": "#8b5cf6",
+      "hex": "#8b5cf6",
+      "description": "Secondary accent color - violet"
+    },
+    "secondaryForeground": {
+      "name": "White",
+      "value": "#ffffff",
+      "hex": "#ffffff"
+    },
+    "background": {
+      "name": "Light Gray",
+      "value": "#f8fafc",
+      "hex": "#f8fafc",
+      "description": "Background - light gray"
+    },
+    "foreground": {
+      "name": "Dark Gray",
+      "value": "#1e293b",
+      "hex": "#1e293b",
+      "description": "Primary text color - dark gray"
+    },
+    "card": {
+      "name": "White",
+      "value": "#ffffff",
+      "hex": "#ffffff"
+    },
+    "cardForeground": {
+      "name": "Dark Gray",
+      "value": "#1e293b",
+      "hex": "#1e293b"
+    },
+    "muted": {
+      "name": "Light Gray",
+      "value": "#e2e8f0",
+      "hex": "#e2e8f0",
+      "description": "Muted elements - light gray"
+    },
+    "mutedForeground": {
+      "name": "Medium Gray",
+      "value": "#64748b",
+      "hex": "#64748b",
+      "description": "Muted text - medium gray"
+    },
+    "accent": {
+      "name": "Modern Blue",
+      "value": "#3b82f6",
+      "hex": "#3b82f6"
+    },
+    "accentForeground": {
+      "name": "White",
+      "value": "#ffffff",
+      "hex": "#ffffff"
+    },
+    "destructive": {
+      "name": "Red",
+      "value": "#ef4444",
+      "hex": "#ef4444"
+    },
+    "destructiveForeground": {
+      "name": "White",
+      "value": "#ffffff",
+      "hex": "#ffffff"
+    },
+    "success": {
+      "name": "Green",
+      "value": "#22c55e",
+      "hex": "#22c55e"
+    },
+    "warning": {
+      "name": "Amber",
+      "value": "#f59e0b",
+      "hex": "#f59e0b"
+    },
+    "border": {
+      "name": "Light Gray",
+      "value": "#e2e8f0",
+      "hex": "#e2e8f0"
+    },
+    "input": {
+      "name": "White",
+      "value": "#ffffff",
+      "hex": "#ffffff"
+    },
+    "ring": {
+      "name": "Modern Blue",
+      "value": "#3b82f6",
+      "hex": "#3b82f6"
+    }
+  },
+
+  "gradients": {
+    "modern": {
+      "name": "Modern Gradient",
+      "value": "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+      "from": "#3b82f6",
+      "to": "#8b5cf6"
+    },
+    "subtle": {
+      "name": "Subtle Gradient",
+      "value": "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
+      "from": "#f8fafc",
+      "to": "#f1f5f9"
+    }
+  },
+
+  "typography": {
+    "fontFamilies": {
+      "sans": {
+        "name": "Inter",
+        "value": "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+        "usage": "All text and headings",
+        "weights": [300, 400, 500, 600, 700]
+      }
+    },
+    "fontSizes": {
+      "display": {
+        "value": "48px",
+        "lineHeight": "56px",
+        "usage": "Page titles"
+      },
+      "h1": {
+        "value": "36px",
+        "lineHeight": "44px",
+        "usage": "Main section headers"
+      },
+      "h2": {
+        "value": "30px",
+        "lineHeight": "38px",
+        "usage": "Subsection headers"
+      },
+      "h3": {
+        "value": "24px",
+        "lineHeight": "32px",
+        "usage": "Card titles"
+      },
+      "h4": {
+        "value": "20px",
+        "lineHeight": "28px",
+        "usage": "Subtitles"
+      },
+      "h5": {
+        "value": "18px",
+        "lineHeight": "26px",
+        "usage": "Small headings"
+      },
+      "h6": {
+        "value": "16px",
+        "lineHeight": "24px",
+        "usage": "Micro headings"
+      },
+      "bodyLarge": {
+        "value": "18px",
+        "lineHeight": "28px",
+        "usage": "Lead text"
+      },
+      "body": {
+        "value": "16px",
+        "lineHeight": "24px",
+        "usage": "Standard text"
+      },
+      "bodySmall": {
+        "value": "14px",
+        "lineHeight": "20px",
+        "usage": "Supporting text"
+      },
+      "caption": {
+        "value": "12px",
+        "lineHeight": "16px",
+        "usage": "Labels and metadata"
+      }
+    },
+    "fontWeights": {
+      "light": 300,
+      "regular": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700
+    },
+    "letterSpacing": {
+      "normal": "0"
+    }
+  },
+
+  "spacing": {
+    "xs": "4px",
+    "sm": "8px",
+    "md": "16px",
+    "lg": "24px",
+    "xl": "32px",
+    "2xl": "48px",
+    "3xl": "64px",
+    "section": "48px",
+    "card": "24px",
+    "element": "16px",
+    "tight": "8px"
+  },
+
+  "borderRadius": {
+    "none": "0",
+    "sm": "4px",
+    "md": "8px",
+    "lg": "12px",
+    "xl": "16px",
+    "2xl": "20px",
+    "full": "9999px",
+    "default": "8px"
+  },
+
+  "shadows": {
+    "sm": {
+      "name": "Small Shadow",
+      "value": "0 1px 2px rgba(0, 0, 0, 0.05)",
+      "usage": "Light elements"
+    },
+    "md": {
+      "name": "Medium Shadow",
+      "value": "0 4px 6px rgba(0, 0, 0, 0.08)",
+      "usage": "Cards and containers"
+    },
+    "lg": {
+      "name": "Large Shadow",
+      "value": "0 10px 15px rgba(0, 0, 0, 0.1)",
+      "usage": "Elevated elements"
+    },
+    "button": {
+      "name": "Button Shadow",
+      "value": "0 2px 4px rgba(59, 130, 246, 0.1)",
+      "usage": "Button hover states"
+    }
+  },
+
+  "borders": {
+    "thin": {
+      "width": "1px",
+      "style": "solid"
+    },
+    "medium": {
+      "width": "2px",
+      "style": "solid"
+    }
+  },
+
+  "buttons": {
+    "primary": {
+      "backgroundColor": "#3b82f6",
+      "color": "#ffffff",
+      "borderColor": "#3b82f6",
+      "hover": {
+        "backgroundColor": "#2563eb",
+        "borderColor": "#2563eb"
+      },
+      "active": {
+        "backgroundColor": "#2563eb"
+      }
+    },
+    "secondary": {
+      "backgroundColor": "#8b5cf6",
+      "color": "#ffffff",
+      "borderColor": "#8b5cf6",
+      "hover": {
+        "backgroundColor": "#7c3aed"
+      }
+    },
+    "outline": {
+      "backgroundColor": "transparent",
+      "color": "#3b82f6",
+      "borderColor": "#e2e8f0",
+      "hover": {
+        "backgroundColor": "#3b82f6",
+        "color": "#ffffff"
+      }
+    },
+    "ghost": {
+      "backgroundColor": "transparent",
+      "color": "#1e293b",
+      "hover": {
+        "backgroundColor": "#f1f5f9"
+      }
+    },
+    "destructive": {
+      "backgroundColor": "#ef4444",
+      "color": "#ffffff",
+      "hover": {
+        "backgroundColor": "#dc2626"
+      }
+    }
+  },
+
+  "cards": {
+    "default": {
+      "backgroundColor": "#ffffff",
+      "borderColor": "#e2e8f0",
+      "shadow": "0 4px 6px rgba(0, 0, 0, 0.08)",
+      "borderRadius": "8px"
+    },
+    "elevated": {
+      "backgroundColor": "#ffffff",
+      "borderColor": "#e2e8f0",
+      "shadow": "0 10px 15px rgba(0, 0, 0, 0.1)",
+      "borderRadius": "12px"
+    }
+  },
+
+  "badges": {
+    "primary": {
+      "backgroundColor": "#3b82f6",
+      "color": "#ffffff"
+    },
+    "secondary": {
+      "backgroundColor": "#8b5cf6",
+      "color": "#ffffff"
+    },
+    "success": {
+      "backgroundColor": "#22c55e",
+      "color": "#ffffff"
+    },
+    "warning": {
+      "backgroundColor": "#f59e0b",
+      "color": "#ffffff"
+    },
+    "destructive": {
+      "backgroundColor": "#ef4444",
+      "color": "#ffffff"
+    },
+    "outline": {
+      "backgroundColor": "transparent",
+      "color": "#3b82f6",
+      "borderColor": "#e2e8f0"
+    }
+  },
+
+  "navigation": {
+    "horizontal": {
+      "backgroundColor": "#ffffff",
+      "borderColor": "#e2e8f0",
+      "item": {
+        "default": {
+          "color": "#64748b",
+          "backgroundColor": "transparent"
+        },
+        "hover": {
+          "color": "#3b82f6",
+          "backgroundColor": "#f1f5f9"
+        },
+        "active": {
+          "color": "#3b82f6",
+          "backgroundColor": "#f1f5f9",
+          "borderBottom": "2px solid #3b82f6"
+        }
+      }
+    }
+  },
+
+  "inputs": {
+    "default": {
+      "backgroundColor": "#ffffff",
+      "borderColor": "#e2e8f0",
+      "color": "#1e293b",
+      "focus": {
+        "borderColor": "#3b82f6",
+        "ringColor": "#3b82f6"
+      },
+      "error": {
+        "borderColor": "#ef4444"
+      }
+    }
+  },
+
+  "tables": {
+    "header": {
+      "backgroundColor": "#f8fafc",
+      "color": "#1e293b",
+      "borderColor": "#e2e8f0"
+    },
+    "row": {
+      "default": {
+        "backgroundColor": "#ffffff",
+        "borderColor": "#e2e8f0"
+      },
+      "hover": {
+        "backgroundColor": "#f1f5f9"
+      },
+      "striped": {
+        "backgroundColor": "#f8fafc"
+      }
+    }
+  },
+
+  "patterns": {
+    "subtle": {
+      "name": "Subtle Pattern",
+      "description": "Minimal dot pattern for backgrounds"
+    }
+  },
+
+  "icons": {
+    "primary": {
+      "color": "#3b82f6"
+    },
+    "secondary": {
+      "color": "#8b5cf6"
+    },
+    "muted": {
+      "color": "#64748b"
+    }
+  },
+
+  "breakpoints": {
+    "mobile": {
+      "value": "640px",
+      "description": "Mobile devices"
+    },
+    "tablet": {
+      "value": "768px",
+      "description": "Tablet devices"
+    },
+    "desktop": {
+      "value": "1024px",
+      "description": "Desktop devices"
+    },
+    "wide": {
+      "value": "1280px",
+      "description": "Wide screens"
+    }
+  },
+
+  "containers": {
+    "narrow": {
+      "maxWidth": "640px",
+      "usage": "Forms and focused content"
+    },
+    "medium": {
+      "maxWidth": "768px",
+      "usage": "Cards and small content"
+    },
+    "wide": {
+      "maxWidth": "1024px",
+      "usage": "Main content areas"
+    },
+    "extraWide": {
+      "maxWidth": "1280px",
+      "usage": "Dashboards and wide layouts"
+    }
+  },
+
+  "animations": {
+    "duration": {
+      "fast": "150ms",
+      "normal": "200ms",
+      "slow": "300ms"
+    },
+    "easing": {
+      "easeIn": "ease-in",
+      "easeOut": "ease-out",
+      "easeInOut": "ease-in-out"
+    },
+    "transitions": {
+      "default": "all 200ms ease-in-out",
+      "fast": "all 150ms ease-in-out",
+      "slow": "all 300ms ease-in-out"
+    }
+  },
+
+  "accessibility": {
+    "contrast": {
+      "minimum": "4.5:1",
+      "enhanced": "7:1"
+    },
+    "focus": {
+      "outlineWidth": "2px",
+      "outlineColor": "#3b82f6",
+      "outlineOffset": "2px"
+    },
+    "touchTarget": {
+      "minimumSize": "44px"
+    }
+  },
+
+  "components": {
+    "header": {
+      "backgroundColor": "#ffffff",
+      "borderBottom": "1px solid #e2e8f0",
+      "height": "64px",
+      "padding": "1.5rem 2rem",
+      "shadow": "0 1px 2px rgba(0, 0, 0, 0.05)"
+    },
+    "footer": {
+      "backgroundColor": "#ffffff",
+      "color": "#64748b",
+      "padding": "2rem"
+    },
+    "sidebar": {
+      "backgroundColor": "#ffffff",
+      "borderColor": "#e2e8f0",
+      "width": "280px"
+    }
+  }
+}

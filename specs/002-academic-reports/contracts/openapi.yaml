@@ -1,0 +1,188 @@
+openapi: 3.0.3
+info:
+  title: Academic Reports API
+  description: Endpoints for retrieving academic grade history and GPA aggregates
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/api
+    description: Development server
+
+tags:
+  - name: Academic Reports
+    description: Student and staff access to academic history
+  - name: Academic Report Exports
+    description: PDF export of academic report
+
+paths:
+  /academic-reports/me:
+    get:
+      tags: [Academic Reports]
+      summary: Get academic report for current student
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Academic report for current student
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcademicReport'
+        '401':
+          description: Unauthorized
+
+  /academic-reports/me/export:
+    get:
+      tags: [Academic Report Exports]
+      summary: Download PDF academic report for current student (Unofficial)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: PDF export generated on demand
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: Unauthorized
+
+  /academic-reports/students/{studentId}:
+    get:
+      tags: [Academic Reports]
+      summary: Admin/advisor view of a student academic report
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Academic report for specified student
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AcademicReport'
+        '403':
+          description: Forbidden (insufficient role)
+        '404':
+          description: Student not found
+
+  /academic-reports/students/{studentId}/export:
+    get:
+      tags: [Academic Report Exports]
+      summary: Download PDF academic report for a student (admin/advisor)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: PDF export generated on demand
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '403':
+          description: Forbidden (insufficient role)
+        '404':
+          description: Student not found
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    AcademicReport:
+      type: object
+      properties:
+        studentId:
+          type: integer
+        cumulativeGPA:
+          type: number
+          nullable: true
+          format: float
+        totalCredits:
+          type: number
+          format: float
+        years:
+          type: array
+          items:
+            $ref: '#/components/schemas/AcademicYear'
+
+    AcademicYear:
+      type: object
+      properties:
+        year:
+          type: integer
+        yearlyGPA:
+          type: number
+          nullable: true
+        totalCredits:
+          type: number
+          format: float
+        semesters:
+          type: array
+          items:
+            $ref: '#/components/schemas/SemesterReport'
+
+    SemesterReport:
+      type: object
+      properties:
+        semester:
+          type: string
+          enum: [summer, winter]
+        semesterGPA:
+          type: number
+          nullable: true
+        totalCredits:
+          type: number
+          format: float
+        courses:
+          type: array
+          items:
+            $ref: '#/components/schemas/CourseAttempt'
+
+    CourseAttempt:
+      type: object
+      properties:
+        courseId:
+          type: integer
+        courseCode:
+          type: string
+        courseName:
+          type: string
+        creditHours:
+          type: number
+          format: float
+        grade:
+          type: string
+          nullable: true
+          enum: [A, B, C, D, F, I, W, null]
+        gradePoints:
+          type: number
+          nullable: true
+          format: float
+        status:
+          type: string
+          enum: [completed, in-progress, dropped, withdrawn]
+        attemptNumber:
+          type: integer
+          description: 1 = earliest
+        isLatestForGpa:
+          type: boolean
+        updatedAt:
+          type: string
+          format: date-time

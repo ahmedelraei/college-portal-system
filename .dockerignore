@@ -1,0 +1,14 @@
+node_modules
+dist
+build
+.next
+coverage
+.turbo
+.git
+.gitignore
+.dockerignore
+.env
+.env.*
+*.log
+.DS_Store
+tmp

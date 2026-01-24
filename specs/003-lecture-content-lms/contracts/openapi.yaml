@@ -1,0 +1,741 @@
+openapi: 3.0.3
+info:
+  title: Lecture Content LMS API
+  description: API endpoints for managing weekly course content and tracking student progress
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/api
+    description: Development server
+
+tags:
+  - name: Weeks
+    description: Weekly content structure management (Admin)
+  - name: Content
+    description: Lecture content items management (Admin)
+  - name: Student Content
+    description: Student-facing content access and progress
+  - name: Files
+    description: File upload handling
+
+paths:
+  # ============ ADMIN: Week Management ============
+  /courses/{courseId}/weeks:
+    get:
+      tags: [Weeks]
+      summary: List all weeks for a course
+      description: Returns all weeks (admin sees all, students see only published)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of weeks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Week'
+        '404':
+          description: Course not found
+
+    post:
+      tags: [Weeks]
+      summary: Create a new week
+      description: Admin only - Creates a new week for the course
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWeekDto'
+      responses:
+        '201':
+          description: Week created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Week'
+        '400':
+          description: Validation error or duplicate week number
+        '403':
+          description: Not authorized (admin only)
+
+  /courses/{courseId}/weeks/{weekId}:
+    get:
+      tags: [Weeks]
+      summary: Get week details
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: weekId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Week details with content items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeekWithContent'
+        '404':
+          description: Week not found
+
+    patch:
+      tags: [Weeks]
+      summary: Update a week
+      description: Admin only
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: weekId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWeekDto'
+      responses:
+        '200':
+          description: Week updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Week'
+        '400':
+          description: Validation error
+        '403':
+          description: Not authorized
+        '404':
+          description: Week not found
+
+    delete:
+      tags: [Weeks]
+      summary: Delete a week
+      description: Admin only - Deletes week and all its content
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: weekId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Week deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '403':
+          description: Not authorized
+        '404':
+          description: Week not found
+
+  # ============ ADMIN: Content Management ============
+  /weeks/{weekId}/content:
+    get:
+      tags: [Content]
+      summary: List content items in a week
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: weekId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of content items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LectureContent'
+
+    post:
+      tags: [Content]
+      summary: Add content to a week
+      description: Admin only
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: weekId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateContentDto'
+      responses:
+        '201':
+          description: Content created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LectureContent'
+        '400':
+          description: Validation error
+        '403':
+          description: Not authorized
+
+  /content/{contentId}:
+    get:
+      tags: [Content]
+      summary: Get content item details
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: contentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Content details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LectureContent'
+        '404':
+          description: Content not found
+
+    patch:
+      tags: [Content]
+      summary: Update content item
+      description: Admin only
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: contentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateContentDto'
+      responses:
+        '200':
+          description: Content updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LectureContent'
+        '403':
+          description: Not authorized
+        '404':
+          description: Content not found
+
+    delete:
+      tags: [Content]
+      summary: Delete content item
+      description: Admin only
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: contentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Content deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '403':
+          description: Not authorized
+        '404':
+          description: Content not found
+
+  /weeks/{weekId}/content/reorder:
+    patch:
+      tags: [Content]
+      summary: Reorder content items in a week
+      description: Admin only - Updates display order for multiple items
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: weekId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReorderContentDto'
+      responses:
+        '200':
+          description: Content reordered
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LectureContent'
+        '403':
+          description: Not authorized
+
+  # ============ FILE UPLOAD ============
+  /content/upload:
+    post:
+      tags: [Files]
+      summary: Upload a file for content
+      description: Admin only - Upload document/attachment (max 50MB)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+                - courseId
+                - weekId
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: File to upload (PDF, DOCX, PPTX, images)
+                courseId:
+                  type: integer
+                weekId:
+                  type: integer
+      responses:
+        '201':
+          description: File uploaded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fileUrl:
+                    type: string
+                    description: URL/path to access the uploaded file
+                  fileName:
+                    type: string
+                  fileSize:
+                    type: integer
+        '400':
+          description: Invalid file type or size exceeded
+        '403':
+          description: Not authorized
+
+  # ============ STUDENT: Content Access ============
+  /courses/{courseId}/content:
+    get:
+      tags: [Student Content]
+      summary: Get course content for enrolled student
+      description: Returns published weeks and content for a course the student is enrolled in
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Course content with progress
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseContentWithProgress'
+        '403':
+          description: Not enrolled or payment pending
+        '404':
+          description: Course not found
+
+  # ============ STUDENT: Progress Tracking ============
+  /content/{contentId}/progress:
+    post:
+      tags: [Student Content]
+      summary: Mark content as completed
+      description: Student marks a content item as completed
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: contentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: Progress recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentProgress'
+        '400':
+          description: Already completed
+        '403':
+          description: Not enrolled in course
+
+    delete:
+      tags: [Student Content]
+      summary: Unmark content completion
+      description: Student removes completion status
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: contentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Progress removed
+        '404':
+          description: Progress not found
+
+  /courses/{courseId}/progress:
+    get:
+      tags: [Student Content]
+      summary: Get progress summary for a course
+      description: Returns completion statistics for the student
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Progress summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgressSummary'
+        '403':
+          description: Not enrolled
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # ============ DTOs ============
+    CreateWeekDto:
+      type: object
+      required:
+        - weekNumber
+        - title
+      properties:
+        weekNumber:
+          type: integer
+          minimum: 1
+          example: 1
+        title:
+          type: string
+          maxLength: 255
+          example: "Introduction to Programming"
+        description:
+          type: string
+          example: "Overview of basic programming concepts"
+        isPublished:
+          type: boolean
+          default: false
+
+    UpdateWeekDto:
+      type: object
+      properties:
+        weekNumber:
+          type: integer
+          minimum: 1
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        isPublished:
+          type: boolean
+
+    CreateContentDto:
+      type: object
+      required:
+        - title
+        - contentType
+      properties:
+        title:
+          type: string
+          maxLength: 255
+          example: "Lecture 1: Variables and Data Types"
+        contentType:
+          $ref: '#/components/schemas/ContentType'
+        externalUrl:
+          type: string
+          format: uri
+          maxLength: 2048
+          example: "https://youtube.com/watch?v=..."
+        fileUrl:
+          type: string
+          maxLength: 512
+          description: Set after uploading via /content/upload
+        textContent:
+          type: string
+          example: "This week we will learn about..."
+        description:
+          type: string
+        displayOrder:
+          type: integer
+          default: 0
+
+    UpdateContentDto:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 255
+        contentType:
+          $ref: '#/components/schemas/ContentType'
+        externalUrl:
+          type: string
+          format: uri
+        fileUrl:
+          type: string
+        textContent:
+          type: string
+        description:
+          type: string
+        displayOrder:
+          type: integer
+
+    ReorderContentDto:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - displayOrder
+            properties:
+              id:
+                type: integer
+              displayOrder:
+                type: integer
+
+    # ============ Entities ============
+    Week:
+      type: object
+      properties:
+        id:
+          type: integer
+        courseId:
+          type: integer
+        weekNumber:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        isPublished:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    WeekWithContent:
+      allOf:
+        - $ref: '#/components/schemas/Week'
+        - type: object
+          properties:
+            content:
+              type: array
+              items:
+                $ref: '#/components/schemas/LectureContent'
+
+    LectureContent:
+      type: object
+      properties:
+        id:
+          type: integer
+        weekId:
+          type: integer
+        title:
+          type: string
+        contentType:
+          $ref: '#/components/schemas/ContentType'
+        externalUrl:
+          type: string
+          nullable: true
+        fileUrl:
+          type: string
+          nullable: true
+        textContent:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        displayOrder:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ContentProgress:
+      type: object
+      properties:
+        id:
+          type: integer
+        studentId:
+          type: integer
+        contentId:
+          type: integer
+        completedAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+
+    ContentType:
+      type: string
+      enum:
+        - video
+        - document
+        - reading
+        - assignment
+
+    # ============ Response Types ============
+    CourseContentWithProgress:
+      type: object
+      properties:
+        courseId:
+          type: integer
+        courseName:
+          type: string
+        weeks:
+          type: array
+          items:
+            type: object
+            properties:
+              week:
+                $ref: '#/components/schemas/Week'
+              content:
+                type: array
+                items:
+                  allOf:
+                    - $ref: '#/components/schemas/LectureContent'
+                    - type: object
+                      properties:
+                        isCompleted:
+                          type: boolean
+                        completedAt:
+                          type: string
+                          format: date-time
+                          nullable: true
+              progress:
+                type: object
+                properties:
+                  completed:
+                    type: integer
+                  total:
+                    type: integer
+
+    ProgressSummary:
+      type: object
+      properties:
+        courseId:
+          type: integer
+        totalItems:
+          type: integer
+        completedItems:
+          type: integer
+        percentComplete:
+          type: number
+          format: float
+        weekProgress:
+          type: array
+          items:
+            type: object
+            properties:
+              weekId:
+                type: integer
+              weekNumber:
+                type: integer
+              title:
+                type: string
+              completed:
+                type: integer
+              total:
+                type: integer

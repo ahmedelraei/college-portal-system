@@ -1,0 +1,331 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Modern Design System */
+:root {
+  /* Modern Color Palette */
+  --background: #f8fafc; /* Light gray background */
+  --foreground: #1e293b; /* Dark gray text */
+  --card: #ffffff; /* White card background */
+  --card-foreground: #1e293b; /* Dark gray text on cards */
+  --popover: #ffffff; /* White popover background */
+  --popover-foreground: #1e293b; /* Dark gray text in popovers */
+  
+  /* Modern Primary Colors */
+  --primary: #3b82f6; /* Modern blue */
+  --primary-foreground: #ffffff; /* White text on primary */
+  --secondary: #8b5cf6; /* Violet */
+  --secondary-foreground: #ffffff; /* White text on secondary */
+  
+  /* Supporting Colors */
+  --muted: #e2e8f0; /* Light gray muted elements */
+  --muted-foreground: #64748b; /* Medium gray text on muted */
+  --accent: #3b82f6; /* Modern blue accent */
+  --accent-foreground: #ffffff; /* White text on accent */
+  
+  /* Status Colors */
+  --destructive: #ef4444; /* Red */
+  --destructive-foreground: #ffffff;
+  --success: #22c55e; /* Green */
+  --warning: #f59e0b; /* Amber */
+  
+  /* Borders and Inputs */
+  --border: #e2e8f0; /* Light gray borders */
+  --input: #ffffff; /* White input background */
+  --ring: #3b82f6; /* Blue focus ring */
+  
+  /* Chart Colors */
+  --chart-1: #3b82f6; /* Blue */
+  --chart-2: #8b5cf6; /* Violet */
+  --chart-3: #06b6d4; /* Indigo */
+  --chart-4: #10b981; /* Emerald */
+  --chart-5: #f59e0b; /* Amber */
+  
+  /* Radius */
+  --radius: 0.5rem; /* Modern rounded corners */
+  
+  /* Sidebar */
+  --sidebar: #ffffff; /* White sidebar */
+  --sidebar-foreground: #1e293b; /* Dark gray sidebar text */
+  --sidebar-primary: #3b82f6; /* Blue sidebar primary */
+  --sidebar-primary-foreground: #ffffff; /* White text on sidebar primary */
+  --sidebar-accent: #8b5cf6; /* Violet sidebar accent */
+  --sidebar-accent-foreground: #ffffff; /* White text on sidebar accent */
+  --sidebar-border: #e2e8f0; /* Light gray sidebar border */
+  --sidebar-ring: #3b82f6; /* Blue sidebar focus ring */
+}
+
+@theme inline {
+  /* Font Configuration for Modern Style */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  
+  /* Color Variables */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  
+  /* Radius Variables */
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 4px);
+  
+  /* Sidebar Variables */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  
+  /* Typography Styles for Modern Aesthetic */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-sans font-semibold;
+  }
+  
+  h1 {
+    @apply text-4xl md:text-5xl font-bold tracking-tight;
+  }
+  
+  h2 {
+    @apply text-3xl md:text-4xl font-semibold tracking-tight;
+  }
+  
+  h3 {
+    @apply text-2xl md:text-3xl font-semibold tracking-tight;
+  }
+  
+  h4 {
+    @apply text-xl md:text-2xl font-semibold tracking-tight;
+  }
+  
+  h5 {
+    @apply text-lg md:text-xl font-semibold tracking-tight;
+  }
+  
+  h6 {
+    @apply text-base md:text-lg font-semibold tracking-tight;
+  }
+}
+
+/* Modern Utility Classes */
+@layer utilities {
+  /* Primary Color */
+  .bg-primary {
+    background-color: var(--primary);
+  }
+  
+  .text-primary {
+    color: var(--primary);
+  }
+  
+  .border-primary {
+    border-color: var(--primary);
+  }
+  
+  /* Secondary Color */
+  .bg-secondary {
+    background-color: var(--secondary);
+  }
+  
+  .text-secondary {
+    color: var(--secondary);
+  }
+  
+  .border-secondary {
+    border-color: var(--secondary);
+  }
+  
+  /* Accent Color */
+  .bg-accent {
+    background-color: var(--accent);
+  }
+  
+  .text-accent {
+    color: var(--accent);
+  }
+  
+  /* Muted Background */
+  .bg-muted {
+    background-color: var(--muted);
+  }
+  
+  .text-muted-foreground {
+    color: var(--muted-foreground);
+  }
+  
+  /* Modern Shadows */
+  .shadow-sm {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+  
+  .shadow-md {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+  }
+  
+  .shadow-lg {
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Button Hover Effect */
+  .button-modern {
+    transition: all 0.2s ease;
+  }
+  
+  .button-modern:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+  }
+  
+  /* Card Hover Effect */
+  .card-modern {
+    transition: all 0.3s ease;
+  }
+
+  .card-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    color: inherit;
+  }
+
+  .card-modern:hover a {
+    color: inherit;
+  }
+  
+  /* Gradient Backgrounds */
+  .bg-gradient-modern {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  }
+  
+  .bg-gradient-subtle {
+    background: linear-gradient(135deg, var(--background) 0%, #f1f5f9 100%);
+  }
+  
+  /* Divider */
+  .divider-modern {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 1.5rem 0;
+  }
+  
+  /* Section Spacing */
+  .section-spacing {
+    padding: 3rem 0;
+  }
+  
+  /* Container Widths */
+  .container-narrow {
+    max-width: 640px;
+  }
+  
+  .container-medium {
+    max-width: 768px;
+  }
+  
+  .container-wide {
+    max-width: 1024px;
+  }
+  
+  .container-extra-wide {
+    max-width: 1280px;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--muted);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2563eb;
+}
+
+/* Selection Color */
+::selection {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+/* Focus Styles */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Link Styles */
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover:not([role="button"]) {
+  color: var(--secondary);
+}
+
+/* Loading Spinner */
+.spinner-modern {
+  border: 3px solid var(--muted);
+  border-top: 3px solid var(--primary);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
