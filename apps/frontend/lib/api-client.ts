@@ -12,7 +12,7 @@ import type {
 } from "./api-types";
 
 const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api";
+  process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8080/api";
 const TOKEN_STORAGE_KEY = "college-portal-token";
 
 let authToken: string | null = null;
@@ -99,7 +99,12 @@ export const apiRequest = async <T>(
     throw error;
   }
 
-  const payload = await response.json().catch(() => null);
+  // Handle 204 No Content or simple OK with no body
+  if (response.status === 204) {
+    return {} as T;
+  }
+
+  const payload = await response.json().catch(() => ({}));
 
   if (!response.ok) {
     const message =
@@ -221,6 +226,7 @@ export const registrationsApi = {
     courseIds: number[];
     semester: string;
     year: number;
+    isPaid?: boolean;
   }) =>
     apiRequest<Registration[]>("/registrations/bulk", {
       method: "POST",

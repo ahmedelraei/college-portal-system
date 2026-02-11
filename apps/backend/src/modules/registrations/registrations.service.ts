@@ -173,7 +173,7 @@ export class RegistrationsService {
         courseId,
         semester,
         year,
-        paymentStatus: PaymentStatus.PENDING,
+        paymentStatus: bulkRegistrationDto.isPaid ? PaymentStatus.PAID : PaymentStatus.PENDING,
       }),
     );
 

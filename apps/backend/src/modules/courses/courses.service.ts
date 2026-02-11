@@ -137,7 +137,7 @@ export class CoursesService {
     return this.coursesRepository.save(course);
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: number): Promise<{ message: string }> {
     const course = await this.findOne(id);
 
     // Check if course has any active registrations
@@ -153,6 +153,7 @@ export class CoursesService {
 
     course.isActive = false;
     await this.coursesRepository.save(course);
+    return { message: 'Course deleted successfully' };
   }
 
   async checkPrerequisites(

@@ -235,8 +235,8 @@ export default function AdminPanelPage() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="bg-primary/10 p-3 rounded-full mb-4 mx-auto w-fit">
-            <Shield className="h-8 w-8 text-primary" />
+          <div className="bg-secondary/10 p-3 rounded-full mb-4 mx-auto w-fit">
+            <Shield className="h-8 w-8 text-secondary" />
           </div>
           <div className="spinner-modern mx-auto mb-4"></div>
           <p className="text-muted-foreground">Verifying admin access...</p>
@@ -252,19 +252,19 @@ export default function AdminPanelPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-primary border-b border-border">
+      <header className="bg-secondary border-b border-border">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3">
-                <div className="bg-white/10 p-3 rounded-full">
-                  <Settings className="h-10 w-10 text-white" />
+                <div className="bg-secondary-foreground/10 p-3 rounded-full">
+                  <Settings className="h-10 w-10 text-secondary-foreground" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-white">
+                  <h1 className="text-2xl font-bold text-secondary-foreground">
                     Modern Academy
                   </h1>
-                  <p className="text-sm text-white/80">
+                  <p className="text-sm text-secondary-foreground/80">
                     Administrative Panel
                   </p>
                 </div>
@@ -272,10 +272,10 @@ export default function AdminPanelPage() {
             </div>
             <div className="flex items-center gap-4">
               <div className="text-right">
-                <p className="text-sm font-medium text-white">
+                <p className="text-sm font-medium text-secondary-foreground">
                   Welcome, {user?.firstName} {user?.lastName}
                 </p>
-                <p className="text-xs text-white/70">
+                <p className="text-xs text-secondary-foreground/70">
                   Administrator
                 </p>
               </div>
@@ -283,7 +283,7 @@ export default function AdminPanelPage() {
                 variant="outline"
                 size="sm"
                 onClick={handleLogout}
-                className="bg-white text-primary hover:bg-primary hover:text-white border-white/20"
+                className="bg-background text-secondary-foreground hover:bg-background/90 border-secondary-foreground/20"
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
@@ -306,12 +306,12 @@ export default function AdminPanelPage() {
           </div>
 
           {/* Registration Toggle Section */}
-          <Card className="border-2 border-border bg-gradient-to-br from-card to-primary/5 shadow-md">
+          <Card className="border-2 border-border bg-gradient-to-br from-card to-secondary/5 shadow-md">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="bg-primary/10 p-3 rounded-full">
-                    <Settings className="h-6 w-6 text-primary" />
+                  <div className="bg-secondary/10 p-3 rounded-full">
+                    <Settings className="h-6 w-6 text-secondary" />
                   </div>
                   <div>
                     <CardTitle className="text-xl text-foreground">
@@ -353,7 +353,7 @@ export default function AdminPanelPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="flex items-start gap-2 text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg border-l-4 border-primary">
+              <div className="flex items-start gap-2 text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg border-l-4 border-secondary">
                 <Shield className="h-4 w-4 mt-0.5 flex-shrink-0" />
                 <p>
                   {isRegistrationEnabled
@@ -366,13 +366,13 @@ export default function AdminPanelPage() {
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card className="border-l-4 border-primary shadow-md">
+            <Card className="border-l-4 border-secondary shadow-md">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Total Students
                 </CardTitle>
                 <div className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-primary" />
+                  <Users className="h-5 w-5 text-secondary" />
                   <span className="text-2xl font-bold text-foreground">
                     {students.length}
                   </span>
@@ -380,13 +380,13 @@ export default function AdminPanelPage() {
               </CardHeader>
             </Card>
 
-            <Card className="border-l-4 border-primary shadow-md">
+            <Card className="border-l-4 border-secondary shadow-md">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Total Courses
                 </CardTitle>
                 <div className="flex items-center gap-2">
-                  <BookOpen className="h-5 w-5 text-primary" />
+                  <BookOpen className="h-5 w-5 text-secondary" />
                   <span className="text-2xl font-bold text-foreground">
                     {courses.length}
                   </span>
@@ -394,13 +394,13 @@ export default function AdminPanelPage() {
               </CardHeader>
             </Card>
 
-            <Card className="border-l-4 border-primary shadow-md">
+            <Card className="border-l-4 border-secondary shadow-md">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   Active Courses
                 </CardTitle>
                 <div className="flex items-center gap-2">
-                  <GraduationCap className="h-5 w-5 text-primary" />
+                  <GraduationCap className="h-5 w-5 text-secondary" />
                   <span className="text-2xl font-bold text-foreground">
                     {courses.filter((course: Course) => course.isActive).length}
                   </span>
@@ -408,7 +408,7 @@ export default function AdminPanelPage() {
               </CardHeader>
             </Card>
 
-            <Card className="border-l-4 border-primary shadow-md">
+            <Card className="border-l-4 border-secondary shadow-md">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   System Status
@@ -429,17 +429,17 @@ export default function AdminPanelPage() {
                   <CardTitle className="flex items-center gap-2 text-foreground">
                     {activeTab === "students" ? (
                       <>
-                        <Users className="h-5 w-5 text-primary" />
+                        <Users className="h-5 w-5 text-secondary" />
                         Student Management
                       </>
                     ) : activeTab === "courses" ? (
                       <>
-                        <BookOpen className="h-5 w-5 text-primary" />
+                        <BookOpen className="h-5 w-5 text-secondary" />
                         Course Management
                       </>
                     ) : (
                       <>
-                        <Award className="h-5 w-5 text-primary" />
+                        <Award className="h-5 w-5 text-secondary" />
                         Grades Management
                       </>
                     )}
@@ -455,7 +455,7 @@ export default function AdminPanelPage() {
                 <div className="flex items-center gap-3">
                   <div className="flex bg-muted rounded-lg p-1">
                     <Button
-                      variant={activeTab === "students" ? "default" : "ghost"}
+                      variant={activeTab === "students" ? "secondary" : "ghost"}
                       size="sm"
                       onClick={() => setActiveTab("students")}
                     >
@@ -463,7 +463,7 @@ export default function AdminPanelPage() {
                       Students
                     </Button>
                     <Button
-                      variant={activeTab === "courses" ? "default" : "ghost"}
+                      variant={activeTab === "courses" ? "secondary" : "ghost"}
                       size="sm"
                       onClick={() => setActiveTab("courses")}
                     >
@@ -471,7 +471,7 @@ export default function AdminPanelPage() {
                       Courses
                     </Button>
                     <Button
-                      variant={activeTab === "grades" ? "default" : "ghost"}
+                      variant={activeTab === "grades" ? "secondary" : "ghost"}
                       size="sm"
                       onClick={() => setActiveTab("grades")}
                     >
@@ -556,12 +556,12 @@ export default function AdminPanelPage() {
                 ) : (
                   <Table>
                     <TableHeader>
-                      <TableRow className="bg-primary">
-                        <TableHead className="text-white font-medium">Student ID</TableHead>
-                        <TableHead className="text-white font-medium">Name</TableHead>
-                        <TableHead className="text-white font-medium">Email</TableHead>
-                        <TableHead className="text-white font-medium">Role</TableHead>
-                        <TableHead className="text-white font-medium">Created</TableHead>
+                      <TableRow className="bg-secondary">
+                        <TableHead className="text-secondary-foreground font-medium">Student ID</TableHead>
+                        <TableHead className="text-secondary-foreground font-medium">Name</TableHead>
+                        <TableHead className="text-secondary-foreground font-medium">Email</TableHead>
+                        <TableHead className="text-secondary-foreground font-medium">Role</TableHead>
+                        <TableHead className="text-secondary-foreground font-medium">Created</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -618,14 +618,14 @@ export default function AdminPanelPage() {
               ) : (
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-primary">
-                      <TableHead className="text-white font-medium">Course Code</TableHead>
-                      <TableHead className="text-white font-medium">Course Name</TableHead>
-                      <TableHead className="text-white font-medium">Credits</TableHead>
-                      <TableHead className="text-white font-medium">Semester</TableHead>
-                      <TableHead className="text-white font-medium">Prerequisites</TableHead>
-                      <TableHead className="text-white font-medium">Status</TableHead>
-                      <TableHead className="text-white font-medium">Actions</TableHead>
+                    <TableRow className="bg-secondary">
+                      <TableHead className="text-secondary-foreground font-medium">Course Code</TableHead>
+                      <TableHead className="text-secondary-foreground font-medium">Course Name</TableHead>
+                      <TableHead className="text-secondary-foreground font-medium">Credits</TableHead>
+                      <TableHead className="text-secondary-foreground font-medium">Semester</TableHead>
+                      <TableHead className="text-secondary-foreground font-medium">Prerequisites</TableHead>
+                      <TableHead className="text-secondary-foreground font-medium">Status</TableHead>
+                      <TableHead className="text-secondary-foreground font-medium">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>

@@ -169,7 +169,7 @@ export function GradesManager() {
               Total Registrations
             </CardTitle>
             <div className="flex items-center gap-2">
-              <GraduationCap className="h-5 w-5 text-primary" />
+              <GraduationCap className="h-5 w-5 text-secondary" />
               <span className="text-2xl font-bold">{totalRegistrations}</span>
             </div>
           </CardHeader>
@@ -310,7 +310,7 @@ export function GradesManager() {
                       </TableCell>
                       <TableCell>{registration.course.creditHours}</TableCell>
                       <TableCell>
-                        <span className="font-bold text-primary">
+                        <span className="font-bold text-secondary">
                           {student.currentGPA.toFixed(2)}
                         </span>
                       </TableCell>
@@ -328,7 +328,7 @@ export function GradesManager() {
                       </TableCell>
                       <TableCell>
                         {registration.isCompleted ? (
-                          <Badge variant="default">Completed</Badge>
+                          <Badge variant="secondary">Completed</Badge>
                         ) : (
                           <Badge variant="secondary">In Progress</Badge>
                         )}
@@ -420,7 +420,7 @@ export function GradesManager() {
                               <Button
                                 onClick={handleAssignGrade}
                                 disabled={!selectedGrade || assigningGrade}
-                                className="w-full"
+                                className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground"
                               >
                                 {assigningGrade
                                   ? "Assigning..."

@@ -205,7 +205,7 @@ export function ContentManager({ courseId }: ContentManagerProps) {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Course Content Management</h2>
-        <Button onClick={() => setIsWeekDialogOpen(true)}>
+        <Button onClick={() => setIsWeekDialogOpen(true)} className="bg-secondary hover:bg-secondary/90 text-secondary-foreground">
           <Plus className="h-4 w-4 mr-2" />
           Add Week
         </Button>
@@ -225,7 +225,7 @@ export function ContentManager({ courseId }: ContentManagerProps) {
                 <div
                   key={week.id}
                   className={`p-3 rounded border cursor-pointer hover:bg-muted/50 ${
-                    selectedWeek?.id === week.id ? "bg-muted border-primary" : ""
+                    selectedWeek?.id === week.id ? "bg-muted border-secondary" : ""
                   }`}
                   onClick={() => setSelectedWeek(week)}
                 >
@@ -234,7 +234,7 @@ export function ContentManager({ courseId }: ContentManagerProps) {
                       <div className="flex items-center gap-2">
                         <span className="font-medium">Week {week.weekNumber}</span>
                         {week.isPublished ? (
-                          <Badge variant="default" className="text-xs">
+                          <Badge variant="secondary" className="text-xs">
                             <Eye className="h-3 w-3 mr-1" />
                             Published
                           </Badge>
@@ -297,7 +297,7 @@ export function ContentManager({ courseId }: ContentManagerProps) {
                   : "Select a week to manage content"}
               </CardTitle>
               {selectedWeek && (
-                <Button onClick={() => setIsContentDialogOpen(true)}>
+                <Button onClick={() => setIsContentDialogOpen(true)} className="bg-secondary hover:bg-secondary/90 text-secondary-foreground">
                   <Plus className="h-4 w-4 mr-2" />
                   Add Content
                 </Button>

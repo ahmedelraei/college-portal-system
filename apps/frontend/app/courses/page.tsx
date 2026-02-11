@@ -250,6 +250,7 @@ export default function CoursesPage() {
         courseIds,
         semester: currentSemester,
         year: currentYear,
+        isPaid: true,
       });
 
       const registrationData = {
@@ -1120,9 +1121,13 @@ export default function CoursesPage() {
                   )}
 
                   {isRegistered ? (
-                    <Button variant="secondary" className="w-full" disabled>
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Already Registered
+                    <Button
+                      variant="secondary"
+                      className="w-full"
+                      onClick={() => router.push(`/courses/${course.id}/content`)}
+                    >
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      View Course Content
                     </Button>
                   ) : !isRegistrationEnabled ? (
                     <Button variant="secondary" className="w-full" disabled>

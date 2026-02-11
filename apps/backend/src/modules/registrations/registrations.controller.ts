@@ -10,6 +10,7 @@ import {
   Request,
   Query,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { RegistrationsService } from './registrations.service';
 import { CreateRegistrationDto } from './dto/create-registration.dto';
@@ -44,6 +45,11 @@ export class RegistrationsController {
       req.user.role === UserRole.STUDENT
         ? this.getStudentId(req)
         : bulkRegistrationDto.studentId;
+
+    if (!studentId) {
+      throw new BadRequestException('studentId is required for admin users');
+    }
+
     return this.registrationsService.bulkRegister(
       studentId,
       bulkRegistrationDto,

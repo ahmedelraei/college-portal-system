@@ -1,8 +1,9 @@
-import { IsNotEmpty, IsString, IsNumber, IsArray, Min } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, IsArray, Min, IsOptional, IsBoolean } from 'class-validator';
 
 export class BulkRegistrationDto {
+  @IsOptional()
   @IsNumber()
-  studentId: number;
+  studentId?: number;
 
   @IsArray()
   @IsNumber({}, { each: true })
@@ -15,4 +16,8 @@ export class BulkRegistrationDto {
   @IsNumber()
   @Min(2020)
   year: number;
+
+  @IsOptional()
+  @IsBoolean()
+  isPaid?: boolean;
 }

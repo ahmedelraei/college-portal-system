@@ -18,10 +18,10 @@ interface ContentFormProps {
   initialData?: {
     title: string;
     contentType: ContentType;
-    externalUrl?: string;
-    fileUrl?: string;
-    textContent?: string;
-    description?: string;
+    externalUrl?: string | null;
+    fileUrl?: string | null;
+    textContent?: string | null;
+    description?: string | null;
     displayOrder?: number;
   };
   onSubmit: (data: {
@@ -241,7 +241,7 @@ export function ContentForm({
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button type="submit" disabled={isSubmitting || isUploading}>
+        <Button type="submit" disabled={isSubmitting || isUploading} className="bg-secondary hover:bg-secondary/90 text-secondary-foreground">
           {isSubmitting ? "Saving..." : initialData ? "Update" : "Create"}
         </Button>
       </div>

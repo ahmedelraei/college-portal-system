@@ -140,7 +140,7 @@ export function WeekForm({ courseId, initialData, onSubmit, onCancel }: WeekForm
           <X className="h-4 w-4 mr-2" />
           Cancel
         </Button>
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" disabled={isSubmitting} className="bg-secondary hover:bg-secondary/90 text-secondary-foreground">
           {isSubmitting ? (
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
           ) : (

@@ -161,7 +161,7 @@ export function AddStudentForm({ onSuccess }: AddStudentFormProps) {
         <Button
           type="submit"
           disabled={isLoading}
-          className="bg-primary hover:bg-primary/90"
+          className="bg-secondary hover:bg-secondary/90 text-secondary-foreground"
         >
           {isLoading ? (
             <>
