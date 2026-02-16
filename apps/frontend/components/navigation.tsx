@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, CreditCard, FileText, Home, Settings } from "lucide-react";
+import { FileText, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter, usePathname } from "next/navigation";
 
@@ -10,11 +10,7 @@ export function Navigation() {
 
   const navItems = [
     { icon: Home, label: "Dashboard", href: "/dashboard" },
-    { icon: BookOpen, label: "Course Catalog", href: "/courses" },
     { icon: FileText, label: "Registration", href: "/courses" },
-    { icon: CreditCard, label: "Payments", href: "#" },
-    { icon: FileText, label: "Academic Records", href: "#" },
-    { icon: Settings, label: "Settings", href: "#" },
   ];
 
   return (

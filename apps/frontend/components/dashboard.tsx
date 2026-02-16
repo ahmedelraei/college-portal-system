@@ -18,8 +18,6 @@ import {
   AlertCircle,
   CheckCircle,
   LogOut,
-  Settings,
-  Bell,
   TrendingUp,
   Clock,
   FileText,
@@ -149,12 +147,6 @@ export function Dashboard() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm">
-              <Bell className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="sm">
-              <Settings className="h-4 w-4" />
-            </Button>
             <Button variant="outline" size="sm" onClick={handleLogout}>
               <LogOut className="h-4 w-4 mr-2" />
               Logout
@@ -396,9 +388,7 @@ function DashboardSkeleton() {
             <Skeleton className="h-4 w-56" />
           </div>
           <div className="flex items-center gap-3">
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
+            <Skeleton className="h-8 w-20" />
           </div>
         </div>
       </div>
