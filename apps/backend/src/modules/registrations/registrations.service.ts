@@ -95,7 +95,7 @@ export class RegistrationsService {
       courseId,
       semester,
       year,
-      paymentStatus: PaymentStatus.PENDING,
+      paymentStatus: PaymentStatus.PAID, // Auto-approve since no payment system is implemented
     });
 
     return this.registrationsRepository.save(registration);
@@ -173,7 +173,7 @@ export class RegistrationsService {
         courseId,
         semester,
         year,
-        paymentStatus: bulkRegistrationDto.isPaid ? PaymentStatus.PAID : PaymentStatus.PENDING,
+        paymentStatus: bulkRegistrationDto.isPaid !== false ? PaymentStatus.PAID : PaymentStatus.PENDING,
       }),
     );
 

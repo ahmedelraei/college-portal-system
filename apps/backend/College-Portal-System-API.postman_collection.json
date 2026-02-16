@@ -1,0 +1,850 @@
+{
+  "info": {
+    "name": "College Portal System API",
+    "description": "Full API collection for the College Portal System backend. Set `token` variable after login (Auth → Login or Admin Login) for protected routes.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "token", "value": "" },
+    { "key": "studentId", "value": "1" },
+    { "key": "courseId", "value": "1" },
+    { "key": "registrationId", "value": "1" },
+    { "key": "paymentId", "value": "1" },
+    { "key": "weekId", "value": "1" },
+    { "key": "contentId", "value": "1" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{token}}", "type": "string" }
+    ]
+  },
+  "item": [
+    {
+      "name": "Health & Root",
+      "item": [
+        {
+          "name": "Root",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api",
+            "description": "Root endpoint"
+          }
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/health",
+            "description": "API health status"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register (Student)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": 10001,\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/register",
+            "description": "Register a new student. No auth required."
+          }
+        },
+        {
+          "name": "Login (Student)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": 10001,\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login",
+            "description": "Student login. Copy access_token from response to collection variable `token`."
+          }
+        },
+        {
+          "name": "Admin Register",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": 0,\n  \"firstName\": \"Admin\",\n  \"lastName\": \"User\",\n  \"email\": \"admin@college.edu\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/admin/register",
+            "description": "Create admin user. No auth required."
+          }
+        },
+        {
+          "name": "Admin Login",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@college.edu\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/admin/login",
+            "description": "Admin login. Copy access_token to collection variable `token`."
+          }
+        },
+        {
+          "name": "Create Student (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": 10002,\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Smith\",\n  \"email\": \"jane.smith@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/admin/students",
+            "description": "Create a student. Requires admin JWT."
+          }
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/auth/profile",
+            "description": "Get current user profile. Requires JWT."
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/auth/logout",
+            "description": "Logout (client should clear token). Requires JWT."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Students",
+      "item": [
+        {
+          "name": "Find All Students (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/students",
+            "description": "List all students. Admin only."
+          }
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/students/me",
+            "description": "Get current student profile."
+          }
+        },
+        {
+          "name": "Get My Transcript",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/students/me/transcript",
+            "description": "Get current student transcript."
+          }
+        },
+        {
+          "name": "Get My Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/students/me/statistics",
+            "description": "Get current student statistics."
+          }
+        },
+        {
+          "name": "Get My GPA",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/students/me/gpa?semester=summer&year=2024",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students", "me", "gpa"],
+              "query": [
+                {"key": "semester", "value": "summer"},
+                {"key": "year", "value": "2024"}
+              ]
+            },
+            "description": "Get current semester GPA. Query: semester (summer|winter), year."
+          }
+        },
+        {
+          "name": "Get Student by ID (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/students/{{studentId}}",
+            "description": "Get student by ID. Admin only."
+          }
+        },
+        {
+          "name": "Get Student Transcript (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/students/{{studentId}}/transcript",
+            "description": "Get transcript for a student. Admin only."
+          }
+        },
+        {
+          "name": "Get Student Statistics (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/students/{{studentId}}/statistics",
+            "description": "Get statistics for a student. Admin only."
+          }
+        },
+        {
+          "name": "Update My Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.updated@example.com\"\n}"
+            },
+            "url": "{{baseUrl}}/api/students/me",
+            "description": "Update current student profile. All fields optional."
+          }
+        },
+        {
+          "name": "Update Student (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Smith\",\n  \"email\": \"jane.updated@example.com\"\n}"
+            },
+            "url": "{{baseUrl}}/api/students/{{studentId}}",
+            "description": "Update a student. Admin only."
+          }
+        },
+        {
+          "name": "Delete Student (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/students/{{studentId}}",
+            "description": "Delete a student. Admin only."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Courses",
+      "item": [
+        {
+          "name": "Create Course (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseCode\": \"CS101\",\n  \"courseName\": \"Introduction to Programming\",\n  \"description\": \"Basic programming concepts\",\n  \"creditHours\": 3,\n  \"pricePerCredit\": 500,\n  \"semester\": \"summer\",\n  \"prerequisiteIds\": []\n}"
+            },
+            "url": "{{baseUrl}}/api/courses",
+            "description": "Create a course. semester: summer | winter. Admin only."
+          }
+        },
+        {
+          "name": "Find All Courses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/courses?semester=summer&search=CS&creditHours=3",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courses"],
+              "query": [
+                {"key": "semester", "value": "summer", "disabled": true},
+                {"key": "search", "value": "CS", "disabled": true},
+                {"key": "creditHours", "value": "3", "disabled": true}
+              ]
+            },
+            "description": "List courses. Query: semester (summer|winter), search, creditHours (1-4)."
+          }
+        },
+        {
+          "name": "Get Course by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/courses/{{courseId}}",
+            "description": "Get course by ID."
+          }
+        },
+        {
+          "name": "Get Course by Code",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/courses/code/CS101",
+            "description": "Get course by course code."
+          }
+        },
+        {
+          "name": "Get Course Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/courses/{{courseId}}/statistics",
+            "description": "Get statistics for a course."
+          }
+        },
+        {
+          "name": "Check Prerequisites",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/courses/{{courseId}}/prerequisites/check",
+            "description": "Check if current student meets prerequisites for a course."
+          }
+        },
+        {
+          "name": "Update Course (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseName\": \"Intro to Programming (Updated)\",\n  \"description\": \"Updated description\",\n  \"isActive\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/courses/{{courseId}}",
+            "description": "Update a course. All fields optional. Admin only."
+          }
+        },
+        {
+          "name": "Delete Course (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/courses/{{courseId}}",
+            "description": "Delete a course. Admin only."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Registrations",
+      "item": [
+        {
+          "name": "Create Registration",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": 1,\n  \"courseId\": 1,\n  \"semester\": \"summer\",\n  \"year\": 2024\n}"
+            },
+            "url": "{{baseUrl}}/api/registrations",
+            "description": "Register for a course. Students: studentId is set from token. semester: summer | winter."
+          }
+        },
+        {
+          "name": "Bulk Register",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": 1,\n  \"courseIds\": [1, 2, 3],\n  \"semester\": \"summer\",\n  \"year\": 2024,\n  \"isPaid\": false\n}"
+            },
+            "url": "{{baseUrl}}/api/registrations/bulk",
+            "description": "Bulk register for multiple courses. Admin must send studentId; students use token."
+          }
+        },
+        {
+          "name": "Find All Registrations (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/registrations?studentId=1&semester=summer&year=2024",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "registrations"],
+              "query": [
+                {"key": "studentId", "value": "1", "disabled": true},
+                {"key": "semester", "value": "summer", "disabled": true},
+                {"key": "year", "value": "2024", "disabled": true}
+              ]
+            },
+            "description": "List all registrations. Admin only. Optional: studentId, semester, year."
+          }
+        },
+        {
+          "name": "Get My Registrations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/registrations/me?semester=summer&year=2024",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "registrations", "me"],
+              "query": [
+                {"key": "semester", "value": "summer", "disabled": true},
+                {"key": "year", "value": "2024", "disabled": true}
+              ]
+            },
+            "description": "Get current student's registrations."
+          }
+        },
+        {
+          "name": "Get My Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/registrations/me/summary?semester=summer&year=2024",
+            "description": "Get registration summary for current student. Required: semester, year."
+          }
+        },
+        {
+          "name": "Get Student Registrations (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/registrations/student/{{studentId}}?semester=summer&year=2024",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "registrations", "student", "{{studentId}}"],
+              "query": [
+                {"key": "semester", "value": "summer", "disabled": true},
+                {"key": "year", "value": "2024", "disabled": true}
+              ]
+            },
+            "description": "Get registrations for a student. Admin only."
+          }
+        },
+        {
+          "name": "Get Student Summary (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/registrations/student/{{studentId}}/summary?semester=summer&year=2024",
+            "description": "Get registration summary for a student. Admin only. Required: semester, year."
+          }
+        },
+        {
+          "name": "Get Registration by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/registrations/{{registrationId}}",
+            "description": "Get a single registration (own or admin)."
+          }
+        },
+        {
+          "name": "Update Registration (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paymentStatus\": \"paid\",\n  \"grade\": \"A\"\n}"
+            },
+            "url": "{{baseUrl}}/api/registrations/{{registrationId}}",
+            "description": "Update registration. paymentStatus: pending|paid|failed|refunded. grade: A|B|C|D|F|I|W. Admin only."
+          }
+        },
+        {
+          "name": "Update Payment Status",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paymentStatus\": \"paid\"\n}"
+            },
+            "url": "{{baseUrl}}/api/registrations/{{registrationId}}/payment-status",
+            "description": "Update payment status only. paymentStatus: pending|paid|failed|refunded."
+          }
+        },
+        {
+          "name": "Drop Registration",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/registrations/{{registrationId}}/drop",
+            "description": "Drop a course registration (student own or admin)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Create Payment",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": 1,\n  \"registrationIds\": [1, 2],\n  \"method\": \"credit_card\"\n}"
+            },
+            "url": "{{baseUrl}}/api/payments",
+            "description": "Create a payment. method: credit_card | debit_card | bank_transfer. Students: studentId from token."
+          }
+        },
+        {
+          "name": "Process Payment",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cardNumber\": \"4111111111111111\",\n  \"expiryDate\": \"12/25\",\n  \"cvv\": \"123\",\n  \"cardholderName\": \"John Doe\"\n}"
+            },
+            "url": "{{baseUrl}}/api/payments/{{paymentId}}/process",
+            "description": "Process a payment. cardNumber: 16 digits, expiryDate: MM/YY, cvv: 3-4 digits."
+          }
+        },
+        {
+          "name": "Find All Payments (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments?studentId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments"],
+              "query": [{"key": "studentId", "value": "1", "disabled": true}]
+            },
+            "description": "List all payments. Admin only. Optional: studentId."
+          }
+        },
+        {
+          "name": "Get My Payments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/payments/me",
+            "description": "Get current student's payments."
+          }
+        },
+        {
+          "name": "Get My Payment History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/payments/me/history",
+            "description": "Get current student's payment history."
+          }
+        },
+        {
+          "name": "Get Payment Statistics (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/payments/statistics",
+            "description": "Get payment statistics. Admin only."
+          }
+        },
+        {
+          "name": "Get Student Payments (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/payments/student/{{studentId}}",
+            "description": "Get payments for a student. Admin only."
+          }
+        },
+        {
+          "name": "Get Student Payment History (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/payments/student/{{studentId}}/history",
+            "description": "Get payment history for a student. Admin only."
+          }
+        },
+        {
+          "name": "Get Payment by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/payments/{{paymentId}}",
+            "description": "Get a single payment."
+          }
+        },
+        {
+          "name": "Refund Payment (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Student withdrawal\"\n}"
+            },
+            "url": "{{baseUrl}}/api/payments/{{paymentId}}/refund",
+            "description": "Refund a payment. Admin only. Body: { \"reason\": \"string\" }."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Lecture Content (Weeks)",
+      "item": [
+        {
+          "name": "Get Weeks by Course",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/courses/{{courseId}}/weeks",
+            "description": "Get all weeks for a course."
+          }
+        },
+        {
+          "name": "Create Week (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"weekNumber\": 1,\n  \"title\": \"Week 1: Introduction\",\n  \"description\": \"Overview of the course\",\n  \"isPublished\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/courses/{{courseId}}/weeks",
+            "description": "Create a week. Admin only."
+          }
+        },
+        {
+          "name": "Get Week by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/courses/{{courseId}}/weeks/{{weekId}}",
+            "description": "Get a single week."
+          }
+        },
+        {
+          "name": "Update Week (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Week 1: Introduction (Updated)\",\n  \"isPublished\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/courses/{{courseId}}/weeks/{{weekId}}",
+            "description": "Update a week. Admin only."
+          }
+        },
+        {
+          "name": "Delete Week (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/courses/{{courseId}}/weeks/{{weekId}}",
+            "description": "Delete a week. Admin only."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Lecture Content (Content)",
+      "item": [
+        {
+          "name": "Get Content by Week",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/weeks/{{weekId}}/content",
+            "description": "Get all content items for a week."
+          }
+        },
+        {
+          "name": "Create Content (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Lecture 1\",\n  \"contentType\": \"video\",\n  \"externalUrl\": \"https://example.com/video\",\n  \"description\": \"Introduction video\",\n  \"displayOrder\": 0\n}"
+            },
+            "url": "{{baseUrl}}/api/weeks/{{weekId}}/content",
+            "description": "Create content. contentType: video | document | reading | assignment. Admin only."
+          }
+        },
+        {
+          "name": "Get Content by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/content/{{contentId}}",
+            "description": "Get a single content item."
+          }
+        },
+        {
+          "name": "Update Content (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Lecture 1 (Updated)\",\n  \"displayOrder\": 1\n}"
+            },
+            "url": "{{baseUrl}}/api/content/{{contentId}}",
+            "description": "Update content. Admin only."
+          }
+        },
+        {
+          "name": "Delete Content (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/content/{{contentId}}",
+            "description": "Delete content. Admin only."
+          }
+        },
+        {
+          "name": "Reorder Content (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    { \"id\": 1, \"displayOrder\": 0 },\n    { \"id\": 2, \"displayOrder\": 1 }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/api/weeks/{{weekId}}/content/reorder",
+            "description": "Reorder content items in a week. Admin only."
+          }
+        },
+        {
+          "name": "Upload File (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {"key": "courseId", "value": "{{courseId}}", "type": "text"},
+                {"key": "weekId", "value": "{{weekId}}", "type": "text"},
+                {"key": "file", "type": "file", "src": []}
+              ]
+            },
+            "url": "{{baseUrl}}/api/content/upload",
+            "description": "Upload a file for lecture content. Multipart form: courseId, weekId, file. Admin only."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Lecture Content (Student)",
+      "item": [
+        {
+          "name": "Get Course Content",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/courses/{{courseId}}/content",
+            "description": "Get full course content (weeks + content). Requires paid registration."
+          }
+        },
+        {
+          "name": "Mark Content Complete",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/content/{{contentId}}/progress",
+            "description": "Mark a content item as complete for current student."
+          }
+        },
+        {
+          "name": "Remove Progress",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/content/{{contentId}}/progress",
+            "description": "Remove progress for a content item."
+          }
+        },
+        {
+          "name": "Get Progress Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/courses/{{courseId}}/progress",
+            "description": "Get progress summary for current student in a course. Requires paid registration."
+          }
+        }
+      ]
+    },
+    {
+      "name": "System Settings",
+      "item": [
+        {
+          "name": "Is Registration Enabled",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/system-settings/registration-enabled",
+            "description": "Check if registration is enabled. No auth required."
+          }
+        },
+        {
+          "name": "Get All Settings (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/system-settings",
+            "description": "Get all system settings. Admin only."
+          }
+        },
+        {
+          "name": "Toggle Registration (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"enabled\": true\n}"
+            },
+            "url": "{{baseUrl}}/api/system-settings/registration",
+            "description": "Enable or disable registration. Admin only."
+          }
+        },
+        {
+          "name": "Update System Setting (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"settingKey\": \"registration_enabled\",\n  \"settingValue\": \"true\"\n}"
+            },
+            "url": "{{baseUrl}}/api/system-settings",
+            "description": "Update a system setting by key. Admin only."
+          }
+        }
+      ]
+    }
+  ]
+}

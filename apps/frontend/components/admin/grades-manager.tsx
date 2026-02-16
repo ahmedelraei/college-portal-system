@@ -73,15 +73,25 @@ export function GradesManager() {
 
   // Filter registrations
   const filteredRegistrations = registrations.filter((reg) => {
-    if (!reg.student) {
+    // Check if required nested objects exist
+    if (!reg.student || !reg.course) {
       return false;
     }
+    
+    // Safely access nested properties with fallback to empty string
+    const firstName = reg.student.firstName?.toLowerCase() || "";
+    const lastName = reg.student.lastName?.toLowerCase() || "";
+    const email = reg.student.email?.toLowerCase() || "";
+    const courseCode = reg.course.courseCode?.toLowerCase() || "";
+    const courseName = reg.course.courseName?.toLowerCase() || "";
+    const search = searchTerm.toLowerCase();
+    
     const matchesSearch =
-      reg.student.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      reg.student.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      reg.student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      reg.course.courseCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      reg.course.courseName.toLowerCase().includes(searchTerm.toLowerCase());
+      firstName.includes(search) ||
+      lastName.includes(search) ||
+      email.includes(search) ||
+      courseCode.includes(search) ||
+      courseName.includes(search);
 
     const matchesSemester =
       semesterFilter === "all" || reg.semester === semesterFilter;
@@ -102,7 +112,13 @@ export function GradesManager() {
         selectedGrade
       );
       toast.success(
-        `Grade ${updated.grade} assigned successfully! Student GPA updated to ${updated.student?.currentGPA?.toFixed(2) ?? "N/A"}`
+        `Grade ${updated.grade} assigned successfully! Student GPA updated to ${
+          updated.student?.currentGPA !== undefined && updated.student?.currentGPA !== null
+            ? (typeof updated.student.currentGPA === 'number' 
+                ? updated.student.currentGPA.toFixed(2) 
+                : (Number(updated.student.currentGPA) || 0).toFixed(2))
+            : "N/A"
+        }`
       );
       setSelectedRegistration(null);
       setSelectedGrade("");
@@ -311,7 +327,9 @@ export function GradesManager() {
                       <TableCell>{registration.course.creditHours}</TableCell>
                       <TableCell>
                         <span className="font-bold text-secondary">
-                          {student.currentGPA.toFixed(2)}
+                          {typeof student.currentGPA === 'number' 
+                            ? student.currentGPA.toFixed(2) 
+                            : (Number(student.currentGPA) || 0).toFixed(2)}
                         </span>
                       </TableCell>
                       <TableCell>
@@ -320,7 +338,9 @@ export function GradesManager() {
                             className={`${getGradeColor(registration.grade)} border`}
                           >
                             {registration.grade} (
-                            {registration.gradePoints?.toFixed(1)})
+                            {typeof registration.gradePoints === 'number' 
+                              ? registration.gradePoints.toFixed(1) 
+                              : (Number(registration.gradePoints) || 0).toFixed(1)})
                           </Badge>
                         ) : (
                           <Badge variant="outline">Not Graded</Badge>
@@ -403,7 +423,9 @@ export function GradesManager() {
                                   <span className="font-medium">
                                     Current GPA:
                                   </span>{" "}
-                                  {student.currentGPA.toFixed(2)}
+                                  {typeof student.currentGPA === 'number' 
+                                    ? student.currentGPA.toFixed(2) 
+                                    : (Number(student.currentGPA) || 0).toFixed(2)}
                                 </p>
                                 <p className="text-sm">
                                   <span className="font-medium">Course:</span>{" "}

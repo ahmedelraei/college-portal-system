@@ -61,7 +61,7 @@ export class Registration {
   @Column({
     type: 'enum',
     enum: PaymentStatus,
-    default: PaymentStatus.PENDING,
+    default: PaymentStatus.PAID, // Auto-approve since no payment system is implemented
   })
   paymentStatus: PaymentStatus;
 

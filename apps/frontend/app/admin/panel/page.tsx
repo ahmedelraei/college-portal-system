@@ -41,6 +41,8 @@ import {
   Edit,
   Trash2,
   Award,
+  ClipboardList,
+  DollarSign,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { AddStudentForm } from "@/components/admin/add-student-form";
@@ -50,8 +52,9 @@ import {
   coursesApi,
   studentsApi,
   systemSettingsApi,
+  registrationsApi,
 } from "@/lib/api-client";
-import type { Course, User } from "@/lib/api-types";
+import type { Course, User, Registration } from "@/lib/api-types";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -63,7 +66,7 @@ export default function AdminPanelPage() {
   const [isAddCourseOpen, setIsAddCourseOpen] = useState(false);
   const [isEditCourseOpen, setIsEditCourseOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
-  const [activeTab, setActiveTab] = useState<"students" | "courses" | "grades">(
+  const [activeTab, setActiveTab] = useState<"students" | "courses" | "grades" | "registrations">(
     "students"
   );
 
@@ -99,13 +102,16 @@ export default function AdminPanelPage() {
 
   const [students, setStudents] = useState<User[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
+  const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [isRegistrationEnabled, setIsRegistrationEnabled] = useState(true);
   const [studentsLoading, setStudentsLoading] = useState(true);
   const [coursesLoading, setCoursesLoading] = useState(true);
+  const [registrationsLoading, setRegistrationsLoading] = useState(true);
   const [registrationStatusLoading, setRegistrationStatusLoading] =
     useState(true);
   const [studentsError, setStudentsError] = useState<Error | null>(null);
   const [coursesError, setCoursesError] = useState<Error | null>(null);
+  const [registrationsError, setRegistrationsError] = useState<Error | null>(null);
 
   const handleLogout = async () => {
     try {
@@ -150,6 +156,23 @@ export default function AdminPanelPage() {
     }
   };
 
+  const loadRegistrations = async () => {
+    try {
+      setRegistrationsLoading(true);
+      const response = await registrationsApi.listAll();
+      setRegistrations(response);
+      setRegistrationsError(null);
+    } catch (error: unknown) {
+      const err =
+        error instanceof Error
+          ? error
+          : new Error("Failed to load registrations");
+      setRegistrationsError(err);
+    } finally {
+      setRegistrationsLoading(false);
+    }
+  };
+
   const loadRegistrationStatus = async () => {
     try {
       setRegistrationStatusLoading(true);
@@ -167,6 +190,7 @@ export default function AdminPanelPage() {
 
     loadStudents();
     loadCourses();
+    loadRegistrations();
     loadRegistrationStatus();
   }, [isAuthenticated, user?.role]);
 
@@ -230,6 +254,19 @@ export default function AdminPanelPage() {
     }
   };
 
+  const handleUpdatePaymentStatus = async (registrationId: number, isPaid: boolean) => {
+    try {
+      await registrationsApi.updatePaymentStatus(registrationId, isPaid ? 'paid' : 'pending');
+      toast.success(`Payment status updated to ${isPaid ? 'PAID' : 'PENDING'}`);
+      await loadRegistrations();
+    } catch (error: unknown) {
+      console.error("Update payment status error:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update payment status"
+      );
+    }
+  };
+
   // Show loading state while auth is being checked
   if (isLoading) {
     return (
@@ -280,10 +317,10 @@ export default function AdminPanelPage() {
                 </p>
               </div>
               <Button
-                variant="outline"
-                size="sm"
+                variant="destructive"
+                size="default"
                 onClick={handleLogout}
-                className="bg-background text-secondary-foreground hover:bg-background/90 border-secondary-foreground/20"
+                className="bg-red-600 hover:bg-red-700 text-white font-medium shadow-md hover:shadow-lg transition-all"
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
@@ -437,10 +474,15 @@ export default function AdminPanelPage() {
                         <BookOpen className="h-5 w-5 text-secondary" />
                         Course Management
                       </>
-                    ) : (
+                    ) : activeTab === "grades" ? (
                       <>
                         <Award className="h-5 w-5 text-secondary" />
                         Grades Management
+                      </>
+                    ) : (
+                      <>
+                        <ClipboardList className="h-5 w-5 text-secondary" />
+                        Registrations Management
                       </>
                     )}
                   </CardTitle>
@@ -449,7 +491,9 @@ export default function AdminPanelPage() {
                       ? "View and manage all registered students"
                       : activeTab === "courses"
                         ? "View and manage all courses"
-                        : "Assign and manage student grades"}
+                        : activeTab === "grades"
+                          ? "Assign and manage student grades"
+                          : "View and manage course registrations and payment status"}
                   </CardDescription>
                 </div>
                 <div className="flex items-center gap-3">
@@ -477,6 +521,14 @@ export default function AdminPanelPage() {
                     >
                       <Award className="h-4 w-4 mr-2" />
                       Grades
+                    </Button>
+                    <Button
+                      variant={activeTab === "registrations" ? "secondary" : "ghost"}
+                      size="sm"
+                      onClick={() => setActiveTab("registrations")}
+                    >
+                      <ClipboardList className="h-4 w-4 mr-2" />
+                      Registrations
                     </Button>
                   </div>
                   {activeTab === "students" ? (
@@ -529,7 +581,110 @@ export default function AdminPanelPage() {
               </div>
             </CardHeader>
             <CardContent>
-              {activeTab === "grades" ? (
+              {activeTab === "registrations" ? (
+                // Registrations Tab Content
+                registrationsLoading ? (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">Loading registrations...</p>
+                  </div>
+                ) : registrationsError ? (
+                  <div className="text-center py-8">
+                    <p className="text-destructive">
+                      Error loading registrations: {registrationsError.message}
+                    </p>
+                  </div>
+                ) : registrations.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">
+                      No registrations found.
+                    </p>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-secondary">
+                        <TableHead className="text-secondary-foreground font-medium">Student</TableHead>
+                        <TableHead className="text-secondary-foreground font-medium">Course</TableHead>
+                        <TableHead className="text-secondary-foreground font-medium">Semester</TableHead>
+                        <TableHead className="text-secondary-foreground font-medium">Payment Status</TableHead>
+                        <TableHead className="text-secondary-foreground font-medium">Grade</TableHead>
+                        <TableHead className="text-secondary-foreground font-medium">Status</TableHead>
+                        <TableHead className="text-secondary-foreground font-medium">Action</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {registrations.map((reg: Registration) => (
+                        <TableRow key={reg.id} className="hover:bg-muted/30 transition-colors">
+                          <TableCell>
+                            <div>
+                              <p className="font-medium text-foreground">
+                                {reg.student?.firstName} {reg.student?.lastName}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                ID: {reg.student?.studentId}
+                              </p>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div>
+                              <p className="font-medium text-foreground">
+                                {reg.course?.courseCode}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                {reg.course?.courseName}
+                              </p>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="secondary" className="capitalize">
+                              {reg.semester} {reg.year}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={reg.paymentStatus === 'paid' ? "default" : "secondary"}
+                              className="capitalize"
+                            >
+                              <DollarSign className="h-3 w-3 mr-1" />
+                              {reg.paymentStatus || 'pending'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {reg.grade ? (
+                              <Badge variant="outline">{reg.grade}</Badge>
+                            ) : (
+                              <span className="text-sm text-muted-foreground">-</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {reg.isDropped ? (
+                              <Badge variant="destructive">Dropped</Badge>
+                            ) : reg.isCompleted ? (
+                              <Badge variant="default">Completed</Badge>
+                            ) : (
+                              <Badge variant="secondary">Active</Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Switch
+                                checked={reg.paymentStatus === 'paid'}
+                                onCheckedChange={(checked) => 
+                                  handleUpdatePaymentStatus(reg.id, checked)
+                                }
+                                disabled={reg.isDropped}
+                              />
+                              <span className="text-xs text-muted-foreground">
+                                {reg.paymentStatus === 'paid' ? 'Paid' : 'Mark Paid'}
+                              </span>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )
+              ) : activeTab === "grades" ? (
                 // Grades Tab Content
                 <div className="p-6">
                   <GradesManager />

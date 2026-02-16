@@ -237,6 +237,11 @@ export const registrationsApi = {
       method: "PATCH",
       body: JSON.stringify({ grade }),
     }),
+  updatePaymentStatus: async (registrationId: number, paymentStatus: 'paid' | 'pending') =>
+    apiRequest<Registration>(`/registrations/${registrationId}/payment-status`, {
+      method: "PATCH",
+      body: JSON.stringify({ paymentStatus }),
+    }),
 };
 
 export const studentsApi = {
