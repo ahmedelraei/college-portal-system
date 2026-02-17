@@ -17,6 +17,7 @@ export const dataSourceOptions: DataSourceOptions = {
   database: configService.get<string>('DB_NAME', 'college_db'),
   entities: [`${__dirname}/../../**/*.entity{.ts,.js}`],
   migrations: [`${__dirname}/../../migrations/*{.ts,.js}`],
+  synchronize: true,
   logging: configService.get('DB_LOGGING') === 'true',
   dropSchema: false,
 };
