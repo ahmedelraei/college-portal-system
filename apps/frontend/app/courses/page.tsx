@@ -1120,11 +1120,12 @@ export default function CoursesPage() {
                     </div>
                   )}
 
+                  {/* TODO: Re-enable course content button later */}
                   {isRegistered ? (
                     <Button
                       variant="secondary"
                       className="w-full"
-                      onClick={() => router.push(`/courses/${course.id}/content`)}
+                      disabled
                     >
                       <BookOpen className="h-4 w-4 mr-2" />
                       View Course Content

@@ -835,14 +835,15 @@ export default function AdminPanelPage() {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <Button
+                            {/* TODO: Re-enable course content management button */}
+                            {/* <Button
                               variant="outline"
                               size="sm"
                               onClick={() => router.push(`/admin/panel/courses/${course.id}/content`)}
                               title="Manage Content"
                             >
                               <BookOpen className="h-4 w-4" />
-                            </Button>
+                            </Button> */}
                             <Button
                               variant="outline"
                               size="sm"

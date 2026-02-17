@@ -305,7 +305,8 @@ export function Dashboard() {
                         </Badge>
                       )}
                     </div>
-                    {registration.paymentStatus === "paid" && (
+                    {/* TODO: Re-enable course content view button for students */}
+                    {/* {registration.paymentStatus === "paid" && (
                       <Button
                         size="sm"
                         variant="outline"
@@ -313,7 +314,7 @@ export function Dashboard() {
                       >
                         View Content
                       </Button>
-                    )}
+                    )} */}
                   </div>
                 </div>
               ))}
