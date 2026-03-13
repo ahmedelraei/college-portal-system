@@ -6,6 +6,7 @@ import {
   Min,
   Max,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { Semester } from '../../../entities/course.entity';
 
 export class CourseFilterDto {
@@ -22,4 +23,14 @@ export class CourseFilterDto {
   @Min(1)
   @Max(4)
   creditHours?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  page?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  limit?: number;
 }

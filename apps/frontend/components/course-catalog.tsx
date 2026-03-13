@@ -55,7 +55,7 @@ export function CourseCatalog() {
           coursesApi.list(),
           registrationsApi.listMine(),
         ]);
-        setCourses(coursesResponse);
+        setCourses(Array.isArray(coursesResponse) ? coursesResponse : coursesResponse.data);
         const activeRegistrations = registrationsResponse.filter(
           (registration) => !registration.isDropped,
         );
@@ -204,7 +204,7 @@ export function CourseCatalog() {
                           </div>
                         </div>
 
-                        {course.prerequisites.length > 0 && (
+                        {course.prerequisites && course.prerequisites.length > 0 && (
                           <div className="mt-3 flex items-center gap-2">
                             {hasPrerequisites ? (
                               <CheckCircle className="h-4 w-4 text-success" />

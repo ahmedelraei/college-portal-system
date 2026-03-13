@@ -5,11 +5,17 @@ import {
   UseGuards,
   Request,
   Get,
+  Query,
+  Patch,
+  Param,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateStudentDto } from './dto/create-student.dto';
+import { CreateProfessorDto } from './dto/create-professor.dto';
 import { LoginDto } from './dto/login.dto';
 import { AdminLoginDto } from './dto/admin-login.dto';
+import { ProfessorLoginDto } from './dto/professor-login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { Roles } from './decorators/roles.decorator';
@@ -48,11 +54,51 @@ export class AuthController {
     );
   }
 
+  @Post('professor/login')
+  async professorLogin(@Body() professorLoginDto: ProfessorLoginDto) {
+    return this.authService.professorLogin(
+      professorLoginDto.email,
+      professorLoginDto.password,
+    );
+  }
+
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @Post('admin/students')
   async createStudent(@Body() createStudentDto: CreateStudentDto) {
     return this.authService.register(createStudentDto);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Post('admin/professors')
+  async createProfessor(@Body() createProfessorDto: CreateProfessorDto) {
+    return this.authService.createProfessor(createProfessorDto);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Get('admin/professors')
+  async getAllProfessors(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('search') search?: string,
+  ) {
+    return this.authService.getAllProfessors(
+      page ? parseInt(page, 10) : 1,
+      limit ? parseInt(limit, 10) : 10,
+      search,
+    );
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Patch('admin/professors/:id')
+  async updateProfessor(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateData: any, // Create a DTO later if needed
+  ) {
+    return this.authService.updateProfessor(id, updateData);
   }
 
   @UseGuards(JwtAuthGuard)

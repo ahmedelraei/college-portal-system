@@ -11,6 +11,7 @@ import { Student } from './student.entity';
 export enum UserRole {
   STUDENT = 'student',
   ADMIN = 'admin',
+  PROFESSOR = 'professor',
 }
 
 @Entity('users')

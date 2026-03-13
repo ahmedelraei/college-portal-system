@@ -18,8 +18,8 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, Save, X } from "lucide-react";
 import { toast } from "sonner";
-import { coursesApi } from "@/lib/api-client";
-import type { Course } from "@/lib/api-types";
+import { coursesApi, professorsApi } from "@/lib/api-client";
+import type { Course, User } from "@/lib/api-types";
 
 const courseSchema = z.object({
   courseCode: z
@@ -46,6 +46,7 @@ const courseSchema = z.object({
     required_error: "Please select a semester",
   }),
   prerequisiteIds: z.array(z.number()).optional(),
+  professorId: z.number().optional().nullable(),
 });
 
 type CourseFormData = z.infer<typeof courseSchema>;
@@ -75,19 +76,27 @@ export function CourseForm({ course, onSuccess, onCancel }: CourseFormProps) {
       creditHours: course?.creditHours || 3,
       semester: (course?.semester as "summer" | "winter") || "summer",
       prerequisiteIds: course?.prerequisites?.map((p) => p.id) || [],
+      professorId: course?.professor?.id || null,
     },
   });
 
   const [availableCourses, setAvailableCourses] = useState<Course[]>([]);
+  const [availableProfessors, setAvailableProfessors] = useState<User[]>([]);
 
-  const loadCourses = useCallback(async () => {
-    const courses = await coursesApi.list();
-    setAvailableCourses(courses.filter((c) => c.id !== course?.id));
+  const loadData = useCallback(async () => {
+    const [courses, professors] = await Promise.all([
+      coursesApi.list(),
+      professorsApi.listAll()
+    ]);
+    const _courses = Array.isArray(courses) ? courses : courses.data;
+    const _professors = Array.isArray(professors) ? professors : professors.data;
+    setAvailableCourses(_courses.filter((c) => c.id !== course?.id));
+    setAvailableProfessors(_professors);
   }, [course?.id]);
 
   useEffect(() => {
-    loadCourses();
-  }, [loadCourses]);
+    loadData();
+  }, [loadData]);
 
   const watchedPrerequisites = watch("prerequisiteIds") || [];
 
@@ -102,6 +111,7 @@ export function CourseForm({ course, onSuccess, onCancel }: CourseFormProps) {
           creditHours: data.creditHours,
           semester: data.semester,
           prerequisiteIds: data.prerequisiteIds,
+          professorId: data.professorId ?? undefined,
         });
         toast.success("Course updated successfully!");
       } else {
@@ -112,10 +122,11 @@ export function CourseForm({ course, onSuccess, onCancel }: CourseFormProps) {
           creditHours: data.creditHours,
           semester: data.semester,
           prerequisiteIds: data.prerequisiteIds,
+          professorId: data.professorId ?? undefined,
         });
         toast.success("Course created successfully!");
       }
-      await loadCourses();
+      await loadData();
       onSuccess();
     } catch (error: unknown) {
       console.error("Course operation error:", error);
@@ -205,6 +216,31 @@ export function CourseForm({ course, onSuccess, onCancel }: CourseFormProps) {
         {errors.semester && (
           <p className="text-sm text-destructive">{errors.semester.message}</p>
         )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="professorId" className="text-sm font-medium">
+          Assigned Professor (Optional)
+        </Label>
+        <Select
+          value={watch("professorId")?.toString() || "unassigned"}
+          onValueChange={(value) =>
+            setValue("professorId", value === "unassigned" ? null : parseInt(value))
+          }
+          disabled={isSubmitting}
+        >
+          <SelectTrigger className="h-10">
+            <SelectValue placeholder="Select professor" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="unassigned">None</SelectItem>
+            {availableProfessors.map((professor) => (
+              <SelectItem key={professor.id} value={professor.id.toString()}>
+                {professor.firstName} {professor.lastName}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="space-y-2">

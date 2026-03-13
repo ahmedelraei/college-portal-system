@@ -20,6 +20,13 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter(),
   );
+   // Enable CORS for all origins
+  app.enableCors({
+    origin: true,
+    credentials: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  });
+
 
   app.setGlobalPrefix('api');
 
@@ -52,18 +59,7 @@ async function bootstrap() {
     prefix: '/uploads/',
   });
 
-  // Enable CORS for frontend
-  app.enableCors({
-    origin: [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'http://127.0.0.1:3000',
-      'http://127.0.0.1:3001',
-    ],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  });
+
 
   // Global validation pipe
   app.useGlobalPipes(

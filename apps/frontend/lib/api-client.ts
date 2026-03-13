@@ -142,6 +142,17 @@ export const authApi = {
     setAuthToken(response.token);
     return response;
   },
+  professorLogin: async (data: { email: string; password: string }) => {
+    const response = await apiRequest<{ token: string; user: User; message: string }>(
+      "/auth/professor/login",
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+      },
+    );
+    setAuthToken(response.token);
+    return response;
+  },
   logout: async () => {
     const response = await apiRequest<{ message: string }>("/auth/logout", {
       method: "POST",
@@ -167,7 +178,21 @@ export const authApi = {
 };
 
 export const coursesApi = {
-  list: async () => apiRequest<Course[]>("/courses"),
+  list: async (params?: { page?: number; limit?: number; search?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.page) query.set("page", String(params.page));
+    if (params?.limit) query.set("limit", String(params.limit));
+    if (params?.search) query.set("search", params.search);
+    const suffix = query.toString();
+    
+    return apiRequest<{
+      data: Course[];
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    }>(`/courses${suffix ? `?${suffix}` : ""}`);
+  },
   create: async (data: {
     courseCode: string;
     courseName: string;
@@ -175,6 +200,7 @@ export const coursesApi = {
     creditHours: number;
     semester: string;
     prerequisiteIds?: number[];
+    professorId?: number;
   }) =>
     apiRequest<Course>("/courses", {
       method: "POST",
@@ -190,6 +216,7 @@ export const coursesApi = {
       semester?: string;
       prerequisiteIds?: number[];
       isActive?: boolean;
+      professorId?: number;
     },
   ) =>
     apiRequest<Course>(`/courses/${id}`, {
@@ -245,8 +272,81 @@ export const registrationsApi = {
 };
 
 export const studentsApi = {
-  listAll: async () => apiRequest<User[]>("/students"),
+  listAll: async (params?: { page?: number; limit?: number; search?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.page) query.set("page", String(params.page));
+    if (params?.limit) query.set("limit", String(params.limit));
+    if (params?.search) query.set("search", params.search);
+    const suffix = query.toString();
+    
+    // We expect the backend to return { data: any[], total: number, page: number, limit: number, totalPages: number }
+    // We map it to { data: User[], total, page, limit, totalPages }
+    return apiRequest<{
+      data: any[]; // The backend currently returns Student objects which contain the User object nested, we need to map this in the component or api client
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    }>(`/students${suffix ? `?${suffix}` : ""}`);
+  },
+  update: async (
+    id: number,
+    data: {
+      firstName?: string;
+      lastName?: string;
+      email?: string;
+      password?: string;
+      isActive?: boolean;
+    }
+  ) =>
+    apiRequest<User>(`/students/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
 };
+
+export const professorsApi = {
+  listAll: async (params?: { page?: number; limit?: number; search?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.page) query.set("page", String(params.page));
+    if (params?.limit) query.set("limit", String(params.limit));
+    if (params?.search) query.set("search", params.search);
+    const suffix = query.toString();
+    
+    return apiRequest<{
+      data: User[];
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    }>(`/auth/admin/professors${suffix ? `?${suffix}` : ""}`);
+  },
+  create: async (data: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+  }) =>
+    apiRequest<User>("/auth/admin/professors", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  update: async (
+    id: number,
+    data: {
+      firstName?: string;
+      lastName?: string;
+      email?: string;
+      password?: string;
+      isActive?: boolean;
+    }
+  ) =>
+    apiRequest<User>(`/auth/admin/professors/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+};
+
 
 export const systemSettingsApi = {
   getRegistrationEnabled: async () =>
@@ -368,4 +468,13 @@ export const lectureContentApi = {
     }),
   getProgressSummary: async (courseId: number) =>
     apiRequest<ProgressSummary>(`/courses/${courseId}/progress`),
+};
+
+export const chatbotApi = {
+  askQuestion: async (courseId: number, message: string) => {
+    return apiRequest<{ reply: string }>('/students/chatbot/ask', {
+      method: 'POST',
+      body: JSON.stringify({ courseId, message }),
+    });
+  },
 };

@@ -103,7 +103,7 @@ export default function CoursesPage() {
             registrationsApi.listMine(),
             systemSettingsApi.getRegistrationEnabled(),
           ]);
-        setCourses(coursesResponse);
+        setCourses(Array.isArray(coursesResponse) ? coursesResponse : coursesResponse.data);
         setRegistrations(registrationsResponse);
         setIsRegistrationEnabled(settingsResponse.enabled);
         setCoursesError(null);
@@ -910,7 +910,7 @@ export default function CoursesPage() {
                         <p className="text-sm text-muted-foreground mt-1">
                           {course.description}
                         </p>
-                        {course.prerequisites?.length > 0 && (
+                        {course.prerequisites && course.prerequisites.length > 0 && (
                           <div className="mt-2">
                             <p className="text-sm font-medium text-foreground">
                               Prerequisites:
@@ -919,7 +919,7 @@ export default function CoursesPage() {
                               {course.prerequisites.map((prereq: Course) => (
                                 <Badge
                                   key={prereq.id}
-                                  variant="outline"
+                                  variant="secondary"
                                   className="text-xs"
                                 >
                                   {prereq.courseCode}
@@ -1103,11 +1103,11 @@ export default function CoursesPage() {
                     </div>
                   </div>
 
-                  {course.prerequisites?.length > 0 && (
+                  {course.prerequisites && course.prerequisites.length > 0 && (
                     <div className="mb-4">
                       <p className="text-xs font-medium text-foreground mb-1">Prerequisites:</p>
                       <div className="flex flex-wrap gap-1">
-                        {course.prerequisites.map((prereq: Course) => (
+                        {course.prerequisites?.map((prereq: Course) => (
                           <Badge
                             key={prereq.id}
                             variant="outline"

@@ -17,6 +17,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (data: { studentId: number; password: string }) => Promise<void>;
   adminLogin: (data: { email: string; password: string }) => Promise<void>;
+  professorLogin: (data: { email: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
 }
@@ -82,6 +83,24 @@ function AuthProviderContent({ children }: AuthProviderProps) {
     [],
   );
 
+  const professorLogin = useCallback(
+    async (professorLoginInput: { email: string; password: string }) => {
+      try {
+        const { user: loggedInUser, message } =
+          await authApi.professorLogin(professorLoginInput);
+        setUser(loggedInUser);
+        setIsAuthenticated(true);
+        toast.success(message);
+      } catch (error: unknown) {
+        const message =
+          error instanceof Error ? error.message : "Professor login failed";
+        toast.error(message);
+        throw error;
+      }
+    },
+    [],
+  );
+
   const logout = useCallback(async () => {
     try {
       const { message } = await authApi.logout();
@@ -107,6 +126,7 @@ function AuthProviderContent({ children }: AuthProviderProps) {
     isLoading,
     login,
     adminLogin,
+    professorLogin,
     logout,
     checkAuth,
   };

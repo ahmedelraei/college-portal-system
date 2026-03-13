@@ -20,7 +20,6 @@ import {
   LogOut,
   TrendingUp,
   Clock,
-  FileText,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { registrationsApi } from "@/lib/api-client";
@@ -42,9 +41,10 @@ export function Dashboard() {
     null,
   );
 
+
   useEffect(() => {
     const loadRegistrations = async () => {
-      if (!isAuthenticated || authLoading || user?.role === "admin") {
+      if (!isAuthenticated || authLoading || user?.role === "admin" || user?.role === "professor") {
         setRegistrationsLoading(false);
         return;
       }
@@ -93,6 +93,11 @@ export function Dashboard() {
           "[Dashboard Component] Admin detected, redirecting to /admin/panel",
         );
         router.push("/admin/panel");
+      } else if (user?.role === "professor") {
+        console.log(
+          "[Dashboard Component] Professor detected, redirecting to /professor/panel",
+        );
+        router.push("/professor/panel");
       } else {
         console.log(
           "[Dashboard Component] Student authenticated, showing dashboard",
@@ -305,16 +310,17 @@ export function Dashboard() {
                         </Badge>
                       )}
                     </div>
-                    {/* TODO: Re-enable course content view button for students */}
-                    {/* {registration.paymentStatus === "paid" && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => router.push(`/courses/${registration.course.id}/content`)}
-                      >
-                        View Content
-                      </Button>
-                    )} */}
+                    {registration.paymentStatus === "paid" && (
+                      <div className="mt-2 text-right">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => router.push(`/courses/${registration.course.id}/content`)}
+                        >
+                          View Content
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -372,6 +378,8 @@ export function Dashboard() {
           </CardContent>
         </Card>
       </div>
+
+
     </div>
   );
 }

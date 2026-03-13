@@ -55,11 +55,18 @@ export class CoursesService {
     return this.coursesRepository.save(course);
   }
 
-  async findAll(filters?: CourseFilterDto): Promise<Course[]> {
+  async findAll(filters?: CourseFilterDto & { professorId?: number }): Promise<any> {
     const queryBuilder = this.coursesRepository
       .createQueryBuilder('course')
       .leftJoinAndSelect('course.prerequisites', 'prerequisites')
+      .leftJoinAndSelect('course.professor', 'professor')
       .where('course.isActive = :isActive', { isActive: true });
+
+    if (filters?.professorId) {
+      queryBuilder.andWhere('course.professorId = :professorId', {
+        professorId: filters.professorId,
+      });
+    }
 
     if (filters?.semester) {
       queryBuilder.andWhere('course.semester = :semester', {
@@ -80,13 +87,29 @@ export class CoursesService {
       });
     }
 
-    return queryBuilder.orderBy('course.courseCode', 'ASC').getMany();
+    const page = filters?.page || 1;
+    const limit = filters?.limit || 10;
+
+    queryBuilder
+      .orderBy('course.courseCode', 'ASC')
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    const [data, total] = await queryBuilder.getManyAndCount();
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async findOne(id: number): Promise<Course> {
     const course = await this.coursesRepository.findOne({
       where: { id, isActive: true },
-      relations: ['prerequisites', 'dependentCourses'],
+      relations: ['prerequisites', 'dependentCourses', 'professor'],
     });
 
     if (!course) {
@@ -99,7 +122,7 @@ export class CoursesService {
   async findByCode(courseCode: string): Promise<Course> {
     const course = await this.coursesRepository.findOne({
       where: { courseCode, isActive: true },
-      relations: ['prerequisites'],
+      relations: ['prerequisites', 'professor'],
     });
 
     if (!course) {

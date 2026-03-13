@@ -29,6 +29,9 @@ export default function DashboardPage() {
       } else if (user?.role === "admin") {
         console.log("[Dashboard] Admin detected, redirecting to /admin/panel");
         router.push("/admin/panel");
+      } else if (user?.role === "professor") {
+        console.log("[Dashboard] Professor detected, redirecting to /professor/panel");
+        router.push("/professor/panel");
       } else {
         console.log("[Dashboard] Student authenticated");
       }
@@ -47,8 +50,8 @@ export default function DashboardPage() {
     );
   }
 
-  // Don't render for admin or unauthenticated users
-  if (!isAuthenticated || user?.role === "admin") {
+  // Don't render for admin/professor or unauthenticated users
+  if (!isAuthenticated || user?.role === "admin" || user?.role === "professor") {
     return null;
   }
 

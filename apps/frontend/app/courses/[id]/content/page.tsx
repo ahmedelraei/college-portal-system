@@ -13,12 +13,13 @@ import {
   BreadcrumbSeparator,
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
-import { ArrowLeft, AlertCircle } from "lucide-react";
+import { ArrowLeft, AlertCircle, Bot } from "lucide-react";
 import { WeekList } from "@/components/lecture-content/week-list";
 import { ProgressIndicator } from "@/components/lecture-content/progress-indicator";
 import { lectureContentApi, coursesApi } from "@/lib/api-client";
 import type { CourseContentWithProgress, Course } from "@/lib/api-types";
 import { toast } from "sonner";
+import { ChatbotDialog } from "@/components/chatbot-dialog";
 
 export default function StudentCourseContentPage() {
   const router = useRouter();
@@ -29,6 +30,7 @@ export default function StudentCourseContentPage() {
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const loadContent = async () => {
     try {
@@ -36,7 +38,10 @@ export default function StudentCourseContentPage() {
       setError(null);
       const [contentData, courseData] = await Promise.all([
         lectureContentApi.getCourseContent(courseId),
-        coursesApi.list().then((courses) => courses.find((c) => c.id === courseId) || null),
+        coursesApi.list().then((response) => {
+          const courses = Array.isArray(response) ? response : response.data;
+          return courses.find((c) => c.id === courseId) || null;
+        }),
       ]);
       setContent(contentData);
       setCourse(courseData);
@@ -53,6 +58,7 @@ export default function StudentCourseContentPage() {
 
   useEffect(() => {
     loadContent();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseId]);
 
   const handleToggleComplete = async (contentId: number, isCompleted: boolean) => {
@@ -145,6 +151,13 @@ export default function StudentCourseContentPage() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
           </Button>
+          <Button
+            variant="secondary"
+            onClick={() => setIsChatOpen(true)}
+          >
+            <Bot className="h-4 w-4 mr-2" />
+            Ask Course Assistant
+          </Button>
         </div>
 
         <Breadcrumb>
@@ -181,6 +194,15 @@ export default function StudentCourseContentPage() {
         </Card>
 
         <WeekList weeks={content.weeks} onToggleComplete={handleToggleComplete} />
+
+        {course && (
+          <ChatbotDialog
+            isOpen={isChatOpen}
+            onClose={() => setIsChatOpen(false)}
+            courseId={course.id}
+            courseName={course.courseName}
+          />
+        )}
       </div>
     </div>
   );

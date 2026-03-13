@@ -11,6 +11,7 @@ import * as bcrypt from 'bcryptjs';
 import { Student } from '../../entities/student.entity';
 import { User, UserRole } from '../../entities/user.entity';
 import { CreateStudentDto } from './dto/create-student.dto';
+import { CreateProfessorDto } from './dto/create-professor.dto';
 import { LoginDto } from './dto/login.dto';
 
 @Injectable()
@@ -177,6 +178,112 @@ export class AuthService {
     }
 
     return this.buildLoginResponse(admin);
+  }
+
+  async validateProfessor(email: string, password: string): Promise<any> {
+    const professor = await this.usersRepository.findOne({
+      where: { email, role: UserRole.PROFESSOR, isActive: true },
+    });
+
+    if (professor && (await bcrypt.compare(password, professor.password))) {
+      const { password: _, ...result } = professor;
+      return result;
+    }
+
+    return null;
+  }
+
+  async professorLogin(email: string, password: string) {
+    const professor = await this.validateProfessor(email, password);
+
+    if (!professor) {
+      throw new UnauthorizedException('Invalid professor credentials');
+    }
+
+    return this.buildLoginResponse(professor);
+  }
+
+  async createProfessor(createProfessorDto: CreateProfessorDto) {
+    const { email, password, firstName, lastName } = createProfessorDto;
+
+    // Check if user already exists
+    const existingUser = await this.usersRepository.findOne({
+      where: { email },
+    });
+
+    if (existingUser) {
+      throw new ConflictException('User with this email already exists');
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    // Create new professor
+    const professor = this.usersRepository.create({
+      email,
+      password: hashedPassword,
+      firstName,
+      lastName,
+      role: UserRole.PROFESSOR,
+    });
+
+    const savedProfessor = await this.usersRepository.save(professor);
+
+    // Return professor without password
+    const { password: _, ...result } = savedProfessor;
+    return result;
+  }
+
+  async getAllProfessors(page: number = 1, limit: number = 10, search?: string) {
+    const queryBuilder = this.usersRepository.createQueryBuilder('user')
+      .where('user.role = :role', { role: UserRole.PROFESSOR });
+
+    if (search) {
+      queryBuilder.andWhere(
+        '(user.firstName ILIKE :search OR user.lastName ILIKE :search OR user.email ILIKE :search)',
+        { search: `%${search}%` }
+      );
+    }
+
+    queryBuilder
+      .orderBy('user.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    const [users, total] = await queryBuilder.getManyAndCount();
+
+    const data = users.map((user) => {
+      const { password: _, ...result } = user;
+      return result;
+    });
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  async updateProfessor(id: number, data: any) {
+    const professor = await this.usersRepository.findOne({
+      where: { id, role: UserRole.PROFESSOR },
+    });
+
+    if (!professor) {
+      throw new NotFoundException('Professor not found');
+    }
+
+    if (data.password) {
+      data.password = await bcrypt.hash(data.password, 12);
+    }
+
+    Object.assign(professor, data);
+    const updated = await this.usersRepository.save(professor);
+    
+    const { password: _, ...result } = updated;
+    return result;
   }
 
   async getAllStudents(): Promise<any[]> {

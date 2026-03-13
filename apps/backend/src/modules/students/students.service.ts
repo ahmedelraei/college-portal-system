@@ -4,6 +4,7 @@ import { Repository, In } from 'typeorm';
 import { Student } from '../../entities/student.entity';
 import { Registration, Grade } from '../../entities/registration.entity';
 import { UpdateStudentDto } from './dto/update-student.dto';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class StudentsService {
@@ -14,12 +15,32 @@ export class StudentsService {
     private registrationsRepository: Repository<Registration>,
   ) {}
 
-  async findAll(): Promise<Student[]> {
-    return this.studentsRepository.find({
-      relations: ['user'],
-      where: { user: { isActive: true } },
-      order: { createdAt: 'DESC' },
-    });
+  async findAll(page: number = 1, limit: number = 10, search?: string): Promise<{ data: Student[], total: number, page: number, limit: number, totalPages: number }> {
+    const queryBuilder = this.studentsRepository.createQueryBuilder('student')
+      .leftJoinAndSelect('student.user', 'user')
+      .where('user.isActive = :isActive', { isActive: true });
+
+    if (search) {
+      queryBuilder.andWhere(
+        '(student."studentId"::text ILIKE :search OR user.firstName ILIKE :search OR user.lastName ILIKE :search OR user.email ILIKE :search)',
+        { search: `%${search}%` }
+      );
+    }
+
+    queryBuilder
+      .orderBy('student.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    const [data, total] = await queryBuilder.getManyAndCount();
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    };
   }
 
   async findOne(id: number): Promise<Student> {
@@ -42,6 +63,9 @@ export class StudentsService {
     const student = await this.findOne(id);
     // Update the user entity, not the student entity
     if (student.user) {
+      if (updateStudentDto.password) {
+        updateStudentDto.password = await bcrypt.hash(updateStudentDto.password, 12);
+      }
       Object.assign(student.user, updateStudentDto);
       await this.studentsRepository.manager.save(student.user);
     }

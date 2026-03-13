@@ -37,20 +37,22 @@ import {
   Calendar,
   Shield,
   BookOpen,
-  Plus,
-  Edit,
-  Trash2,
   Award,
   ClipboardList,
   DollarSign,
+  Briefcase,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { AddStudentForm } from "@/components/admin/add-student-form";
+import { EditStudentForm } from "@/components/admin/edit-student-form";
+import { AddProfessorForm } from "@/components/admin/add-professor-form";
+import { EditProfessorForm } from "@/components/admin/edit-professor-form";
 import { CourseForm } from "@/components/admin/course-form";
 import { GradesManager } from "@/components/admin/grades-manager";
 import {
   coursesApi,
   studentsApi,
+  professorsApi,
   systemSettingsApi,
   registrationsApi,
 } from "@/lib/api-client";
@@ -58,15 +60,20 @@ import type { Course, User, Registration } from "@/lib/api-types";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 export default function AdminPanelPage() {
   const router = useRouter();
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
+  const [isEditStudentOpen, setIsEditStudentOpen] = useState(false);
+  const [editingStudent, setEditingStudent] = useState<User | undefined>();
+  const [isAddProfessorOpen, setIsAddProfessorOpen] = useState(false);
+  const [isEditProfessorOpen, setIsEditProfessorOpen] = useState(false);
+  const [editingProfessor, setEditingProfessor] = useState<User | undefined>();
   const [isAddCourseOpen, setIsAddCourseOpen] = useState(false);
-  const [isEditCourseOpen, setIsEditCourseOpen] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
-  const [activeTab, setActiveTab] = useState<"students" | "courses" | "grades" | "registrations">(
+  const [editingCourse, setEditingCourse] = useState<Course | undefined>();
+  const [activeTab, setActiveTab] = useState<"students" | "professors" | "courses" | "grades" | "registrations">(
     "students"
   );
 
@@ -101,17 +108,65 @@ export default function AdminPanelPage() {
   }, [isAuthenticated, isLoading, user, router]);
 
   const [students, setStudents] = useState<User[]>([]);
+  const [studentPage, setStudentPage] = useState(1);
+  const [studentTotalPages, setStudentTotalPages] = useState(1);
+  const [studentSearchInput, setStudentSearchInput] = useState("");
+  const [studentDebouncedSearch, setStudentDebouncedSearch] = useState("");
+
+  const [professors, setProfessors] = useState<User[]>([]);
+  const [professorPage, setProfessorPage] = useState(1);
+  const [professorTotalPages, setProfessorTotalPages] = useState(1);
+  const [professorSearchInput, setProfessorSearchInput] = useState("");
+  const [professorDebouncedSearch, setProfessorDebouncedSearch] = useState("");
+
   const [courses, setCourses] = useState<Course[]>([]);
+  const [coursePage, setCoursePage] = useState(1);
+  const [courseTotalPages, setCourseTotalPages] = useState(1);
+  const [courseSearchInput, setCourseSearchInput] = useState("");
+  const [courseDebouncedSearch, setCourseDebouncedSearch] = useState("");
+
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [isRegistrationEnabled, setIsRegistrationEnabled] = useState(true);
   const [studentsLoading, setStudentsLoading] = useState(true);
+  const [professorsLoading, setProfessorsLoading] = useState(true);
   const [coursesLoading, setCoursesLoading] = useState(true);
   const [registrationsLoading, setRegistrationsLoading] = useState(true);
   const [registrationStatusLoading, setRegistrationStatusLoading] =
     useState(true);
   const [studentsError, setStudentsError] = useState<Error | null>(null);
+  const [professorsError, setProfessorsError] = useState<Error | null>(null);
   const [coursesError, setCoursesError] = useState<Error | null>(null);
   const [registrationsError, setRegistrationsError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (studentDebouncedSearch !== studentSearchInput) {
+        setStudentDebouncedSearch(studentSearchInput);
+        setStudentPage(1);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [studentSearchInput, studentDebouncedSearch]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (professorDebouncedSearch !== professorSearchInput) {
+        setProfessorDebouncedSearch(professorSearchInput);
+        setProfessorPage(1);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [professorSearchInput, professorDebouncedSearch]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (courseDebouncedSearch !== courseSearchInput) {
+        setCourseDebouncedSearch(courseSearchInput);
+        setCoursePage(1);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [courseSearchInput, courseDebouncedSearch]);
 
   const handleLogout = async () => {
     try {
@@ -125,8 +180,23 @@ export default function AdminPanelPage() {
   const loadStudents = async () => {
     try {
       setStudentsLoading(true);
-      const response = await studentsApi.listAll();
-      setStudents(response);
+      const response = await studentsApi.listAll({
+        page: studentPage,
+        limit: 10,
+        search: studentDebouncedSearch || undefined,
+      });
+
+      if (Array.isArray(response)) {
+        setStudents(response);
+      } else if (response.data) {
+        const mapped = response.data.map((s: any) => ({
+          ...s.user,
+          studentId: s.studentId,
+          id: s.id,
+        }));
+        setStudents(mapped);
+        setStudentTotalPages((response as any).totalPages || 1);
+      }
       setStudentsError(null);
     } catch (error: unknown) {
       const err =
@@ -139,11 +209,46 @@ export default function AdminPanelPage() {
     }
   };
 
+  const loadProfessors = async () => {
+    try {
+      setProfessorsLoading(true);
+      const response = await professorsApi.listAll({
+        page: professorPage,
+        limit: 10,
+        search: professorDebouncedSearch || undefined,
+      });
+      if (Array.isArray(response)) {
+        setProfessors(response);
+      } else if (response.data) {
+        setProfessors(response.data);
+        setProfessorTotalPages((response as any).totalPages || 1);
+      }
+      setProfessorsError(null);
+    } catch (error: unknown) {
+      const err =
+        error instanceof Error
+          ? error
+          : new Error("Failed to load professors");
+      setProfessorsError(err);
+    } finally {
+      setProfessorsLoading(false);
+    }
+  };
+
   const loadCourses = async () => {
     try {
       setCoursesLoading(true);
-      const response = await coursesApi.list();
-      setCourses(response);
+      const response = await coursesApi.list({
+        page: coursePage,
+        limit: 10,
+        search: courseDebouncedSearch || undefined,
+      });
+      if (Array.isArray(response)) {
+        setCourses(response);
+      } else if (response.data) {
+        setCourses(response.data);
+        setCourseTotalPages((response as any).totalPages || 1);
+      }
       setCoursesError(null);
     } catch (error: unknown) {
       const err =
@@ -183,16 +288,42 @@ export default function AdminPanelPage() {
     }
   };
 
+  // Load initial data for other tabs
   useEffect(() => {
     if (!isAuthenticated || user?.role !== "admin") {
       return;
     }
 
-    loadStudents();
-    loadCourses();
     loadRegistrations();
     loadRegistrationStatus();
   }, [isAuthenticated, user?.role]);
+
+  // Load professors separately due to pagination dependencies
+  useEffect(() => {
+    if (!isAuthenticated || user?.role !== "admin") {
+      return;
+    }
+    loadProfessors();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user?.role, professorPage, professorDebouncedSearch]);
+
+  // Load courses separately due to pagination dependencies
+  useEffect(() => {
+    if (!isAuthenticated || user?.role !== "admin") {
+      return;
+    }
+    loadCourses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user?.role, coursePage, courseDebouncedSearch]);
+
+  // Load students separately due to pagination dependencies
+  useEffect(() => {
+    if (!isAuthenticated || user?.role !== "admin") {
+      return;
+    }
+    loadStudents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user?.role, studentPage, studentDebouncedSearch]);
 
   const handleStudentAdded = () => {
     setIsAddStudentOpen(false);
@@ -200,40 +331,28 @@ export default function AdminPanelPage() {
     toast.success("Student added successfully!");
   };
 
-  const handleCourseAdded = () => {
+  const handleProfessorAdded = () => {
+    setIsAddProfessorOpen(false);
+    loadProfessors();
+    toast.success("Professor added successfully!");
+  };
+
+  const handleCourseSuccess = () => {
     setIsAddCourseOpen(false);
+    setEditingCourse(undefined);
     loadCourses();
-    toast.success("Course added successfully!");
   };
 
-  const handleCourseUpdated = () => {
-    setIsEditCourseOpen(false);
-    setSelectedCourse(null);
-    loadCourses();
-    toast.success("Course updated successfully!");
-  };
-
-  const handleEditCourse = (course: Course) => {
-    setSelectedCourse(course);
-    setIsEditCourseOpen(true);
-  };
-
-  const handleDeleteCourse = async (courseId: number, courseName: string) => {
-    if (
-      window.confirm(
-        `Are you sure you want to delete "${courseName}"? This action cannot be undone.`
-      )
-    ) {
-      try {
-        await coursesApi.remove(courseId);
-        toast.success("Course deleted successfully!");
-        loadCourses();
-      } catch (error: unknown) {
-        console.error("Delete course error:", error);
-        toast.error(
-          error instanceof Error ? error.message : "Failed to delete course"
-        );
-      }
+  const handleDeleteCourse = async (id: number) => {
+    if (!confirm("Are you sure you want to delete this course?")) return;
+    try {
+      await coursesApi.remove(id);
+      toast.success("Course deleted successfully!");
+      loadCourses();
+    } catch (error: unknown) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete course"
+      );
     }
   };
 
@@ -402,7 +521,7 @@ export default function AdminPanelPage() {
           </Card>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
             <Card className="border-l-4 border-secondary shadow-md">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -412,6 +531,20 @@ export default function AdminPanelPage() {
                   <Users className="h-5 w-5 text-secondary" />
                   <span className="text-2xl font-bold text-foreground">
                     {students.length}
+                  </span>
+                </div>
+              </CardHeader>
+            </Card>
+
+            <Card className="border-l-4 border-secondary shadow-md">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Total Professors
+                </CardTitle>
+                <div className="flex items-center gap-2">
+                  <Briefcase className="h-5 w-5 text-secondary" />
+                  <span className="text-2xl font-bold text-foreground">
+                    {professors.length}
                   </span>
                 </div>
               </CardHeader>
@@ -469,6 +602,11 @@ export default function AdminPanelPage() {
                         <Users className="h-5 w-5 text-secondary" />
                         Student Management
                       </>
+                    ) : activeTab === "professors" ? (
+                      <>
+                        <Briefcase className="h-5 w-5 text-secondary" />
+                        Professor Management
+                      </>
                     ) : activeTab === "courses" ? (
                       <>
                         <BookOpen className="h-5 w-5 text-secondary" />
@@ -489,8 +627,8 @@ export default function AdminPanelPage() {
                   <CardDescription>
                     {activeTab === "students"
                       ? "View and manage all registered students"
-                      : activeTab === "courses"
-                        ? "View and manage all courses"
+                      : activeTab === "professors"
+                        ? "View and manage all professors"
                         : activeTab === "grades"
                           ? "Assign and manage student grades"
                           : "View and manage course registrations and payment status"}
@@ -505,6 +643,14 @@ export default function AdminPanelPage() {
                     >
                       <Users className="h-4 w-4 mr-2" />
                       Students
+                    </Button>
+                    <Button
+                      variant={activeTab === "professors" ? "secondary" : "ghost"}
+                      size="sm"
+                      onClick={() => setActiveTab("professors")}
+                    >
+                      <Briefcase className="h-4 w-4 mr-2" />
+                      Professors
                     </Button>
                     <Button
                       variant={activeTab === "courses" ? "secondary" : "ghost"}
@@ -532,51 +678,148 @@ export default function AdminPanelPage() {
                     </Button>
                   </div>
                   {activeTab === "students" ? (
-                    <Dialog
-                      open={isAddStudentOpen}
-                      onOpenChange={setIsAddStudentOpen}
-                    >
-                      <DialogTrigger asChild>
-                        <Button>
-                          <UserPlus className="h-4 w-4 mr-2" />
-                          Add Student
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                          <DialogTitle>Add New Student</DialogTitle>
-                          <DialogDescription>
-                            Create a new student account with login credentials.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <AddStudentForm onSuccess={handleStudentAdded} />
-                      </DialogContent>
-                    </Dialog>
-                  ) : (
+                    <>
+                      <Dialog
+                        open={isAddStudentOpen}
+                        onOpenChange={setIsAddStudentOpen}
+                      >
+                        <DialogTrigger asChild>
+                          <Button>
+                            <UserPlus className="h-4 w-4 mr-2" />
+                            Add Student
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px]">
+                          <DialogHeader>
+                            <DialogTitle>Add New Student</DialogTitle>
+                            <DialogDescription>
+                              Create a new student account with login credentials.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <AddStudentForm onSuccess={handleStudentAdded} />
+                        </DialogContent>
+                      </Dialog>
+                      <Dialog
+                        open={isEditStudentOpen}
+                        onOpenChange={(open) => {
+                          setIsEditStudentOpen(open);
+                          if (!open) setEditingStudent(undefined);
+                        }}
+                      >
+                        <DialogContent className="sm:max-w-[500px]">
+                          <DialogHeader>
+                            <DialogTitle>Edit Student</DialogTitle>
+                            <DialogDescription>
+                              Update student details or change their password.
+                            </DialogDescription>
+                          </DialogHeader>
+                          {editingStudent && (
+                            <EditStudentForm
+                              student={editingStudent}
+                              onSuccess={() => {
+                                setIsEditStudentOpen(false);
+                                setEditingStudent(undefined);
+                                loadStudents();
+                              }}
+                              onCancel={() => {
+                                setIsEditStudentOpen(false);
+                                setEditingStudent(undefined);
+                              }}
+                            />
+                          )}
+                        </DialogContent>
+                      </Dialog>
+                    </>
+                  ) : activeTab === "professors" ? (
+                    <>
+                      <Dialog
+                        open={isAddProfessorOpen}
+                        onOpenChange={setIsAddProfessorOpen}
+                      >
+                        <DialogTrigger asChild>
+                          <Button>
+                            <UserPlus className="h-4 w-4 mr-2" />
+                            Add Professor
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px]">
+                          <DialogHeader>
+                            <DialogTitle>Add New Professor</DialogTitle>
+                            <DialogDescription>
+                              Create a new professor account with login credentials.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <AddProfessorForm onSuccess={handleProfessorAdded} />
+                        </DialogContent>
+                      </Dialog>
+
+                      <Dialog
+                        open={isEditProfessorOpen}
+                        onOpenChange={(open) => {
+                          setIsEditProfessorOpen(open);
+                          if (!open) setEditingProfessor(undefined);
+                        }}
+                      >
+                        <DialogContent className="sm:max-w-[500px]">
+                          <DialogHeader>
+                            <DialogTitle>Edit Professor</DialogTitle>
+                            <DialogDescription>
+                              Update professor details or change their password.
+                            </DialogDescription>
+                          </DialogHeader>
+                          {editingProfessor && (
+                            <EditProfessorForm
+                              professor={editingProfessor}
+                              onSuccess={() => {
+                                setIsEditProfessorOpen(false);
+                                setEditingProfessor(undefined);
+                                loadProfessors();
+                              }}
+                              onCancel={() => {
+                                setIsEditProfessorOpen(false);
+                                setEditingProfessor(undefined);
+                              }}
+                            />
+                          )}
+                        </DialogContent>
+                      </Dialog>
+                    </>
+                  ) : activeTab === "courses" ? (
                     <Dialog
                       open={isAddCourseOpen}
-                      onOpenChange={setIsAddCourseOpen}
+                      onOpenChange={(open) => {
+                        setIsAddCourseOpen(open);
+                        if (!open) setEditingCourse(undefined);
+                      }}
                     >
                       <DialogTrigger asChild>
                         <Button>
-                          <Plus className="h-4 w-4 mr-2" />
+                          <BookOpen className="h-4 w-4 mr-2" />
                           Add Course
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="sm:max-w-[600px]">
+                      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
                         <DialogHeader>
-                          <DialogTitle>Add New Course</DialogTitle>
+                          <DialogTitle>
+                            {editingCourse ? "Edit Course" : "Add New Course"}
+                          </DialogTitle>
                           <DialogDescription>
-                            Create a new course with details and prerequisites.
+                            {editingCourse
+                              ? "Update course details."
+                              : "Create a new course and set its prerequisites."}
                           </DialogDescription>
                         </DialogHeader>
                         <CourseForm
-                          onSuccess={handleCourseAdded}
-                          onCancel={() => setIsAddCourseOpen(false)}
+                          course={editingCourse}
+                          onSuccess={handleCourseSuccess}
+                          onCancel={() => {
+                            setIsAddCourseOpen(false);
+                            setEditingCourse(undefined);
+                          }}
                         />
                       </DialogContent>
                     </Dialog>
-                  )}
+                  ) : null}
                 </div>
               </div>
             </CardHeader>
@@ -684,6 +927,229 @@ export default function AdminPanelPage() {
                     </TableBody>
                   </Table>
                 )
+              ) : activeTab === "professors" ? (
+                // Professors Tab Content
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center bg-card p-4 rounded-lg border shadow-sm">
+                    <Input
+                      placeholder="Search professors by Name or Email..."
+                      value={professorSearchInput}
+                      onChange={(e) => setProfessorSearchInput(e.target.value)}
+                      className="max-w-md"
+                    />
+                  </div>
+                  {professorsLoading ? (
+                    <div className="text-center py-8">
+                      <p className="text-muted-foreground">Loading professors...</p>
+                    </div>
+                  ) : professorsError ? (
+                    <div className="text-center py-8">
+                      <p className="text-destructive">
+                        Error loading professors: {professorsError.message}
+                      </p>
+                    </div>
+                  ) : professors.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-muted-foreground">
+                        No professors added yet. Add your first professor to get started.
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-secondary">
+                          <TableHead className="text-secondary-foreground font-medium">Name</TableHead>
+                          <TableHead className="text-secondary-foreground font-medium">Email</TableHead>
+                          <TableHead className="text-secondary-foreground font-medium">Role</TableHead>
+                          <TableHead className="text-secondary-foreground font-medium">Created</TableHead>
+                          <TableHead className="text-secondary-foreground font-medium text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                    <TableBody>
+                      {professors.map((professor: User) => (
+                        <TableRow key={professor.id} className="hover:bg-muted/30 transition-colors">
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <div className="bg-secondary/10 p-2 rounded-full">
+                                <Briefcase className="h-4 w-4 text-secondary" />
+                              </div>
+                              <span className="font-medium text-foreground">
+                                {professor.firstName} {professor.lastName}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Mail className="h-4 w-4 text-muted-foreground" />
+                              {professor.email}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge className="capitalize">{professor.role}</Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4 text-muted-foreground" />
+                              {professor.createdAt
+                                ? new Date(professor.createdAt).toLocaleDateString()
+                                : "N/A"}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setEditingProfessor(professor);
+                                setIsEditProfessorOpen(true);
+                              }}
+                            >
+                              Edit
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                  <div className="flex justify-between items-center bg-card p-4 rounded-lg border shadow-sm">
+                    <Button 
+                      variant="outline"
+                      disabled={professorPage <= 1} 
+                      onClick={() => setProfessorPage(p => p - 1)}
+                    >Previous</Button>
+                    <span className="text-sm text-muted-foreground font-medium">
+                      Page {professorPage} of {professorTotalPages}
+                    </span>
+                    <Button 
+                      variant="outline"
+                      disabled={professorPage >= professorTotalPages} 
+                      onClick={() => setProfessorPage(p => p + 1)}
+                    >Next</Button>
+                  </div>
+                  </>
+                )}
+              </div>
+              ) : activeTab === "courses" ? (
+                // Courses Tab Content
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center bg-card p-4 rounded-lg border shadow-sm">
+                    <Input
+                      placeholder="Search courses by Code or Title..."
+                      value={courseSearchInput}
+                      onChange={(e) => setCourseSearchInput(e.target.value)}
+                      className="max-w-md"
+                    />
+                  </div>
+                  {coursesLoading ? (
+                    <div className="text-center py-8">
+                      <p className="text-muted-foreground">Loading courses...</p>
+                    </div>
+                  ) : coursesError ? (
+                    <div className="text-center py-8">
+                      <p className="text-destructive">
+                        Error loading courses: {coursesError.message}
+                      </p>
+                    </div>
+                  ) : courses.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-muted-foreground">
+                        No courses found. Add your first course to get started.
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                    <Table>
+                    <TableHeader>
+                      <TableRow className="bg-secondary">
+                        <TableHead className="text-secondary-foreground font-medium">Code</TableHead>
+                        <TableHead className="text-secondary-foreground font-medium">Name</TableHead>
+                        <TableHead className="text-secondary-foreground font-medium">Semester</TableHead>
+                        <TableHead className="text-secondary-foreground font-medium">Credits</TableHead>
+                        <TableHead className="text-secondary-foreground font-medium">Professor</TableHead>
+                        <TableHead className="text-secondary-foreground font-medium">Status</TableHead>
+                        <TableHead className="text-secondary-foreground font-medium text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {courses.map((course: Course) => (
+                        <TableRow key={course.id} className="hover:bg-muted/30 transition-colors">
+                          <TableCell className="font-medium text-foreground">
+                            {course.courseCode}
+                          </TableCell>
+                          <TableCell>
+                            <div>
+                              <p>{course.courseName}</p>
+                              <p className="text-xs text-muted-foreground line-clamp-1 max-w-[200px]">
+                                {course.description}
+                              </p>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="capitalize">
+                              {course.semester}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{course.creditHours}</TableCell>
+                          <TableCell>
+                            {course.professor ? (
+                              <span className="text-sm">
+                                {course.professor.firstName} {course.professor.lastName}
+                              </span>
+                            ) : (
+                              <span className="text-sm text-muted-foreground">Unassigned</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {course.isActive ? (
+                              <Badge variant="default" className="bg-success">Active</Badge>
+                            ) : (
+                              <Badge variant="secondary">Inactive</Badge>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setEditingCourse(course);
+                                  setIsAddCourseOpen(true);
+                                }}
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleDeleteCourse(course.id)}
+                              >
+                                Delete
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                  <div className="flex justify-between items-center bg-card p-4 rounded-lg border shadow-sm">
+                    <Button 
+                      variant="outline"
+                      disabled={coursePage <= 1} 
+                      onClick={() => setCoursePage(p => p - 1)}
+                    >Previous</Button>
+                    <span className="text-sm text-muted-foreground font-medium">
+                      Page {coursePage} of {courseTotalPages}
+                    </span>
+                    <Button 
+                      variant="outline"
+                      disabled={coursePage >= courseTotalPages} 
+                      onClick={() => setCoursePage(p => p + 1)}
+                    >Next</Button>
+                  </div>
+                  </>
+                )}
+              </div>
               ) : activeTab === "grades" ? (
                 // Grades Tab Content
                 <div className="p-6">
@@ -691,12 +1157,21 @@ export default function AdminPanelPage() {
                 </div>
               ) : activeTab === "students" ? (
                 // Students Tab Content
-                studentsLoading ? (
-                  <div className="text-center py-8">
-                    <p className="text-muted-foreground">Loading students...</p>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center bg-card p-4 rounded-lg border shadow-sm">
+                    <Input
+                      placeholder="Search students by ID, Name or Email..."
+                      value={studentSearchInput}
+                      onChange={(e) => setStudentSearchInput(e.target.value)}
+                      className="max-w-md"
+                    />
                   </div>
-                ) : studentsError ? (
-                  <div className="text-center py-8">
+                  {studentsLoading ? (
+                    <div className="text-center py-8">
+                      <p className="text-muted-foreground">Loading students...</p>
+                    </div>
+                  ) : studentsError ? (
+                    <div className="text-center py-8">
                     <p className="text-destructive">
                       Error loading students: {studentsError.message}
                     </p>
@@ -709,7 +1184,8 @@ export default function AdminPanelPage() {
                     </p>
                   </div>
                 ) : (
-                  <Table>
+                  <>
+                    <Table>
                     <TableHeader>
                       <TableRow className="bg-secondary">
                         <TableHead className="text-secondary-foreground font-medium">Student ID</TableHead>
@@ -717,6 +1193,7 @@ export default function AdminPanelPage() {
                         <TableHead className="text-secondary-foreground font-medium">Email</TableHead>
                         <TableHead className="text-secondary-foreground font-medium">Role</TableHead>
                         <TableHead className="text-secondary-foreground font-medium">Created</TableHead>
+                        <TableHead className="text-secondary-foreground font-medium text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -747,153 +1224,45 @@ export default function AdminPanelPage() {
                                 : "N/A"}
                             </div>
                           </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setEditingStudent(student);
+                                setIsEditStudentOpen(true);
+                              }}
+                            >
+                              Edit
+                            </Button>
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
                   </Table>
-                )
-              ) : // Courses Tab Content
-              coursesLoading ? (
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground">Loading courses...</p>
-                </div>
-              ) : coursesError ? (
-                <div className="text-center py-8">
-                  <p className="text-destructive">
-                    Error loading courses: {coursesError.message}
-                  </p>
-                </div>
-              ) : courses.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground">
-                    No courses available yet. Add your first course to get
-                    started.
-                  </p>
-                </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-secondary">
-                      <TableHead className="text-secondary-foreground font-medium">Course Code</TableHead>
-                      <TableHead className="text-secondary-foreground font-medium">Course Name</TableHead>
-                      <TableHead className="text-secondary-foreground font-medium">Credits</TableHead>
-                      <TableHead className="text-secondary-foreground font-medium">Semester</TableHead>
-                      <TableHead className="text-secondary-foreground font-medium">Prerequisites</TableHead>
-                      <TableHead className="text-secondary-foreground font-medium">Status</TableHead>
-                      <TableHead className="text-secondary-foreground font-medium">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {courses.map((course: Course) => (
-                      <TableRow key={course.id} className="hover:bg-muted/30 transition-colors">
-                        <TableCell className="font-medium text-foreground">
-                          {course.courseCode}
-                        </TableCell>
-                        <TableCell>
-                          <div>
-                            <p className="font-medium text-foreground">{course.courseName}</p>
-                            <p className="text-sm text-muted-foreground truncate max-w-xs">
-                              {course.description}
-                            </p>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline">
-                            {course.creditHours} credits
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="secondary" className="capitalize">
-                            {course.semester}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex flex-wrap gap-1">
-                            {course.prerequisites.length === 0 ? (
-                              <span className="text-sm text-muted-foreground">
-                                None
-                              </span>
-                            ) : (
-                              course.prerequisites.map((prereq) => (
-                                <Badge
-                                  key={prereq.id}
-                                  variant="secondary"
-                                  className="text-xs"
-                                >
-                                  {prereq.courseCode}
-                                </Badge>
-                              ))
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={course.isActive ? "default" : "secondary"}
-                          >
-                            {course.isActive ? "Active" : "Inactive"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            {/* TODO: Re-enable course content management button */}
-                            {/* <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => router.push(`/admin/panel/courses/${course.id}/content`)}
-                              title="Manage Content"
-                            >
-                              <BookOpen className="h-4 w-4" />
-                            </Button> */}
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleEditCourse(course)}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() =>
-                                handleDeleteCourse(course.id, course.courseName)
-                              }
-                              className="border-destructive text-destructive hover:bg-destructive hover:text-white"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
+                  <div className="flex justify-between items-center bg-card p-4 rounded-lg border shadow-sm">
+                    <Button 
+                      variant="outline"
+                      disabled={studentPage <= 1} 
+                      onClick={() => setStudentPage(p => p - 1)}
+                    >Previous</Button>
+                    <span className="text-sm text-muted-foreground font-medium">
+                      Page {studentPage} of {studentTotalPages}
+                    </span>
+                    <Button 
+                      variant="outline"
+                      disabled={studentPage >= studentTotalPages} 
+                      onClick={() => setStudentPage(p => p + 1)}
+                    >Next</Button>
+                  </div>
+                  </>
+                )}
+              </div>
+              ) : null}
             </CardContent>
           </Card>
         </div>
       </main>
-
-      {/* Edit Course Dialog */}
-      <Dialog open={isEditCourseOpen} onOpenChange={setIsEditCourseOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>Edit Course</DialogTitle>
-            <DialogDescription>
-              Update course details and prerequisites.
-            </DialogDescription>
-          </DialogHeader>
-          {selectedCourse && (
-            <CourseForm
-              course={selectedCourse}
-              onSuccess={handleCourseUpdated}
-              onCancel={() => {
-                setIsEditCourseOpen(false);
-                setSelectedCourse(null);
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

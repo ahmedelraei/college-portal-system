@@ -246,4 +246,76 @@ export class SeederService {
       throw error;
     }
   }
+
+  async seed1000Students(): Promise<void> {
+    this.logger.log('🌱 Starting to seed 1000 students...');
+    try {
+      const startId = 20000000;
+      
+      // Check if already seeded
+      const existingStudent = await this.studentsRepository.findOne({
+        where: { studentId: startId },
+      });
+
+      if (existingStudent) {
+        this.logger.log('1000 students already seem to be seeded (found startId). Skipping.');
+        return;
+      }
+
+      const defaultPassword = 'Student123!';
+      const hashedPassword = await bcrypt.hash(defaultPassword, 12);
+      
+      const egyptianFirstNames = [
+        'Ahmed', 'Mohamed', 'Mahmoud', 'Omar', 'Ali', 'Hassan', 'Hussein', 'Youssef', 'Amr', 'Tarek',
+        'Fatima', 'Aisha', 'Salma', 'Nour', 'Habiba', 'Mariam', 'Yasmin', 'Sara', 'Laila', 'Hala',
+        'Mostafa', 'Ibrahim', 'Kareem', 'Adel', 'Hatem', 'Osama', 'Wael', 'Khaled', 'Sherif', 'Mina',
+        'Nadia', 'Dina', 'Menna', 'Yara', 'Hoda', 'Eman', 'Amira', 'Reem', 'Aya', 'Maha'
+      ];
+
+      const egyptianLastNames = [
+        'El-Sayed', 'Hassan', 'Ali', 'Ibrahim', 'Kamal', 'Fawzy', 'Saeed', 'Adel', 'Mansour', 'Tawfik',
+        'Gaber', 'Ezzat', 'Rashad', 'Hamed', 'Soliman', 'Farouk', 'Osman', 'Abdel-Rahman', 'Nassar', 'Ghanem',
+        'Zaki', 'Mahmoud', 'Fahmy', 'Fathy', 'Radwan', 'Shawky', 'Saleh', 'Salem', 'Wahba', 'Saad'
+      ];
+      
+      const userBatch: User[] = [];
+      
+      for (let i = 0; i < 1000; i++) {
+        const studentId = startId + i;
+        const email = `student${studentId}@modernacademy.edu`;
+        const randomFirstName = egyptianFirstNames[Math.floor(Math.random() * egyptianFirstNames.length)];
+        const randomLastName = egyptianLastNames[Math.floor(Math.random() * egyptianLastNames.length)];
+        
+        userBatch.push(
+          this.usersRepository.create({
+            email,
+            password: hashedPassword,
+            firstName: randomFirstName,
+            lastName: randomLastName,
+            role: UserRole.STUDENT,
+            isActive: true,
+          })
+        );
+      }
+
+      // Save users in chunks
+      const savedUsers = await this.usersRepository.save(userBatch, { chunk: 100 });
+      this.logger.log('✅ Successfully saved 1000 user records.');
+
+      const studentBatch: Student[] = savedUsers.map((user, idx) => {
+        return this.studentsRepository.create({
+          studentId: startId + idx,
+          userId: user.id,
+        });
+      });
+
+      // Save students in chunks
+      await this.studentsRepository.save(studentBatch, { chunk: 100 });
+      this.logger.log('✅ Successfully saved 1000 student records.');
+      this.logger.log('✅ 1000 students seeding completed.');
+    } catch (error) {
+      this.logger.error('❌ Failed to seed 1000 students:', error.message);
+      throw error;
+    }
+  }
 }

@@ -10,6 +10,7 @@ import { RegistrationsModule } from './modules/registrations/registrations.modul
 import { PaymentsModule } from './modules/payments/payments.module';
 import { SystemSettingsModule } from './modules/system-settings/system-settings.module';
 import { LectureContentModule } from './modules/lecture-content/lecture-content.module';
+import { ChatbotModule } from './modules/chatbot/chatbot.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { LectureContentModule } from './modules/lecture-content/lecture-content.
     PaymentsModule,
     SystemSettingsModule,
     LectureContentModule,
+    ChatbotModule,
   ],
   controllers: [AppController],
   providers: [AppService],

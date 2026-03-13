@@ -26,8 +26,9 @@ export default function AdminCourseContentPage() {
   useEffect(() => {
     coursesApi
       .list()
-      .then((courses) => {
-        const found = courses.find((c) => c.id === courseId);
+      .then((response) => {
+        const _courses = Array.isArray(response) ? response : response.data;
+        const found = _courses.find((c) => c.id === courseId);
         setCourse(found || null);
       })
       .catch(() => {

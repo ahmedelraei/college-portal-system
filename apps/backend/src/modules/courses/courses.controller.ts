@@ -33,7 +33,11 @@ export class CoursesController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  findAll(@Query() filters: CourseFilterDto) {
+  findAll(@Query() filters: CourseFilterDto, @Request() req) {
+    const user = req.user;
+    if (user?.role === UserRole.PROFESSOR) {
+      return this.coursesService.findAll({ ...filters, professorId: user.id });
+    }
     return this.coursesService.findAll(filters);
   }
 

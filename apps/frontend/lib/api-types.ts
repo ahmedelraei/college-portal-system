@@ -1,4 +1,4 @@
-export type UserRole = "student" | "admin";
+export type UserRole = "student" | "admin" | "professor";
 
 export interface User {
   id: number;
@@ -9,6 +9,7 @@ export interface User {
   role: UserRole;
   createdAt?: string;
   currentGPA?: number | null;
+  isActive?: boolean;
 }
 
 export interface Course {
@@ -17,9 +18,16 @@ export interface Course {
   courseName: string;
   description: string;
   creditHours: number;
-  semester: "winter" | "summer";
-  prerequisites: Course[];
+  pricePerCredit: number;
+  semester: string;
   isActive: boolean;
+  professorId?: number;
+  professor?: User;
+  prerequisites?: Course[];
+  dependentCourses?: Course[];
+  createdAt: string;
+  updatedAt: string;
+  totalCost: number;
 }
 
 export interface Registration {

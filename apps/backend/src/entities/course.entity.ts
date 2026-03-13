@@ -7,8 +7,10 @@ import {
   JoinTable,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
 } from 'typeorm';
 import { Week } from './week.entity';
+import { User } from './user.entity';
 
 export enum Semester {
   SUMMER = 'summer',
@@ -58,6 +60,12 @@ export class Course {
 
   @OneToMany('Registration', 'course')
   registrations: any[];
+
+  @ManyToOne(() => User, { nullable: true })
+  professor: User;
+
+  @Column({ nullable: true })
+  professorId: number;
 
   @OneToMany(() => Week, (week) => week.course)
   weeks: Week[];
