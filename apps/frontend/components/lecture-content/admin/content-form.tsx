@@ -35,6 +35,7 @@ interface ContentFormProps {
   }) => Promise<void>;
   onCancel: () => void;
   onUpload?: (file: File) => Promise<{ fileUrl: string }>;
+  submitButtonClassName?: string;
 }
 
 export function ContentForm({
@@ -42,6 +43,7 @@ export function ContentForm({
   onSubmit,
   onCancel,
   onUpload,
+  submitButtonClassName,
 }: ContentFormProps) {
   const [title, setTitle] = useState(initialData?.title || "");
   const [contentType, setContentType] = useState<ContentType>(
@@ -241,7 +243,7 @@ export function ContentForm({
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button type="submit" disabled={isSubmitting || isUploading} className="bg-secondary hover:bg-secondary/90 text-secondary-foreground">
+        <Button type="submit" disabled={isSubmitting || isUploading} className={submitButtonClassName || "bg-secondary hover:bg-secondary/90 text-secondary-foreground"}>
           {isSubmitting ? "Saving..." : initialData ? "Update" : "Create"}
         </Button>
       </div>

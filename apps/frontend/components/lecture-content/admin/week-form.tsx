@@ -39,9 +39,10 @@ interface WeekFormProps {
     isPublished?: boolean;
   }) => Promise<void>;
   onCancel: () => void;
+  submitButtonClassName?: string;
 }
 
-export function WeekForm({ courseId, initialData, onSubmit, onCancel }: WeekFormProps) {
+export function WeekForm({ courseId, initialData, onSubmit, onCancel, submitButtonClassName }: WeekFormProps) {
   const week = initialData;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isEditing = !!week;
@@ -140,7 +141,7 @@ export function WeekForm({ courseId, initialData, onSubmit, onCancel }: WeekForm
           <X className="h-4 w-4 mr-2" />
           Cancel
         </Button>
-        <Button type="submit" disabled={isSubmitting} className="bg-secondary hover:bg-secondary/90 text-secondary-foreground">
+        <Button type="submit" disabled={isSubmitting} className={submitButtonClassName || "bg-secondary hover:bg-secondary/90 text-secondary-foreground"}>
           {isSubmitting ? (
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
           ) : (

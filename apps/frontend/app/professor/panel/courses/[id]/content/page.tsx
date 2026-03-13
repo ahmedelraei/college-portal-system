@@ -81,7 +81,7 @@ export default function ProfessorCourseContentPage() {
             </Button>
           </div>
         ) : (
-          <ContentManager courseId={courseId} />
+          <ContentManager courseId={courseId} theme="emerald" />
         )}
       </main>
     </div>

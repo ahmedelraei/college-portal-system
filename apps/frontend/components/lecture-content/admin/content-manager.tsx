@@ -30,9 +30,22 @@ import { toast } from "sonner";
 
 interface ContentManagerProps {
   courseId: number;
+  theme?: "primary" | "emerald";
 }
 
-export function ContentManager({ courseId }: ContentManagerProps) {
+export function ContentManager({ courseId, theme = "primary" }: ContentManagerProps) {
+  const isEmerald = theme === "emerald";
+  const buttonClass = isEmerald 
+    ? "bg-emerald-600 hover:bg-emerald-700 text-white" 
+    : "bg-secondary hover:bg-secondary/90 text-secondary-foreground";
+  
+  const activeWeekClass = isEmerald
+    ? "bg-emerald-50/50 border-emerald-500 shadow-sm"
+    : "bg-muted border-secondary";
+
+  const publishedBadgeClass = isEmerald
+    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+    : "";
   const [weeks, setWeeks] = useState<Week[]>([]);
   const [selectedWeek, setSelectedWeek] = useState<Week | null>(null);
   const [weekContents, setWeekContents] = useState<LectureContent[]>([]);
@@ -205,7 +218,7 @@ export function ContentManager({ courseId }: ContentManagerProps) {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Course Content Management</h2>
-        <Button onClick={() => setIsWeekDialogOpen(true)} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+        <Button onClick={() => setIsWeekDialogOpen(true)} className={buttonClass}>
           <Plus className="h-4 w-4 mr-2" />
           Add Week
         </Button>
@@ -225,7 +238,7 @@ export function ContentManager({ courseId }: ContentManagerProps) {
                 <div
                   key={week.id}
                   className={`p-3 rounded border cursor-pointer hover:bg-muted/50 transition-colors ${
-                    selectedWeek?.id === week.id ? "bg-emerald-50/50 border-emerald-500 shadow-sm" : ""
+                    selectedWeek?.id === week.id ? activeWeekClass : ""
                   }`}
                   onClick={() => setSelectedWeek(week)}
                 >
@@ -234,7 +247,7 @@ export function ContentManager({ courseId }: ContentManagerProps) {
                       <div className="flex items-center gap-2">
                         <span className="font-medium">Week {week.weekNumber}</span>
                         {week.isPublished ? (
-                          <Badge variant="outline" className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200">
+                          <Badge variant={isEmerald ? "outline" : "secondary"} className={`text-xs ${publishedBadgeClass}`}>
                             <Eye className="h-3 w-3 mr-1" />
                             Published
                           </Badge>
@@ -297,7 +310,7 @@ export function ContentManager({ courseId }: ContentManagerProps) {
                   : "Select a week to manage content"}
               </CardTitle>
               {selectedWeek && (
-                <Button onClick={() => setIsContentDialogOpen(true)} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                <Button onClick={() => setIsContentDialogOpen(true)} className={buttonClass}>
                   <Plus className="h-4 w-4 mr-2" />
                   Add Content
                 </Button>
@@ -394,6 +407,7 @@ export function ContentManager({ courseId }: ContentManagerProps) {
               setIsWeekDialogOpen(false);
               setEditingWeek(null);
             }}
+            submitButtonClassName={buttonClass}
           />
         </DialogContent>
       </Dialog>
@@ -425,6 +439,7 @@ export function ContentManager({ courseId }: ContentManagerProps) {
               setEditingContent(null);
             }}
             onUpload={handleUploadFile}
+            submitButtonClassName={buttonClass}
           />
         </DialogContent>
       </Dialog>
