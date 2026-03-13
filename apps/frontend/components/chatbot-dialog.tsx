@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, Send, Bot, User } from "lucide-react";
 import { chatbotApi } from "@/lib/api-client";
 
@@ -93,8 +92,8 @@ export function ChatbotDialog({ courseId, courseName, isOpen, onClose }: Chatbot
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[500px] h-[600px] flex flex-col p-0 gap-0">
-        <DialogHeader className="p-4 border-b bg-muted/30">
+      <DialogContent className="sm:max-w-[500px] h-[600px] max-h-[85vh] flex flex-col p-0 gap-0">
+        <DialogHeader className="p-4 border-b bg-muted/30 shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <Bot className="w-5 h-5 text-primary" />
             Course Assistant - {courseName}
@@ -104,7 +103,7 @@ export function ChatbotDialog({ courseId, courseName, isOpen, onClose }: Chatbot
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+        <div className="flex-1 overflow-y-auto p-4" ref={scrollRef}>
           <div className="space-y-4">
             {messages.map((msg, i) => (
               <div
@@ -152,9 +151,9 @@ export function ChatbotDialog({ courseId, courseName, isOpen, onClose }: Chatbot
               </div>
             )}
           </div>
-        </ScrollArea>
+        </div>
 
-        <div className="p-4 border-t bg-background">
+        <div className="p-4 border-t bg-background shrink-0">
           <div className="flex gap-2 relative">
             <Textarea
               placeholder="Ask a question..."
