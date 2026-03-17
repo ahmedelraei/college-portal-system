@@ -12,8 +12,8 @@ import {
 } from '@nestjs/common';
 import { LectureContentService } from './lecture-content.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { AdminAuthGuard } from '../auth/guards/admin-auth.guard';
 import { PaidRegistrationGuard } from './guards/paid-registration.guard';
+import { InstructorAuthGuard } from '../auth/guards/instructor-auth.guard';
 import { CreateWeekDto } from './dto/create-week.dto';
 import { UpdateWeekDto } from './dto/update-week.dto';
 import { CreateContentDto } from './dto/create-content.dto';
@@ -40,7 +40,7 @@ export class LectureContentController {
   }
 
   @Post('courses/:courseId/weeks')
-  @UseGuards(JwtAuthGuard, AdminAuthGuard)
+  @UseGuards(JwtAuthGuard, InstructorAuthGuard)
   async createWeek(
     @Param('courseId', ParseIntPipe) courseId: number,
     @Body() dto: CreateWeekDto,
@@ -55,7 +55,7 @@ export class LectureContentController {
   }
 
   @Patch('courses/:courseId/weeks/:weekId')
-  @UseGuards(JwtAuthGuard, AdminAuthGuard)
+  @UseGuards(JwtAuthGuard, InstructorAuthGuard)
   async updateWeek(
     @Param('weekId', ParseIntPipe) weekId: number,
     @Body() dto: UpdateWeekDto,
@@ -64,7 +64,7 @@ export class LectureContentController {
   }
 
   @Delete('courses/:courseId/weeks/:weekId')
-  @UseGuards(JwtAuthGuard, AdminAuthGuard)
+  @UseGuards(JwtAuthGuard, InstructorAuthGuard)
   async deleteWeek(@Param('weekId', ParseIntPipe) weekId: number) {
     await this.lectureContentService.deleteWeek(weekId);
     return { message: 'Week deleted successfully' };
@@ -78,7 +78,7 @@ export class LectureContentController {
   }
 
   @Post('weeks/:weekId/content')
-  @UseGuards(JwtAuthGuard, AdminAuthGuard)
+  @UseGuards(JwtAuthGuard, InstructorAuthGuard)
   async createContent(
     @Param('weekId', ParseIntPipe) weekId: number,
     @Body() dto: CreateContentDto,
@@ -99,7 +99,7 @@ export class LectureContentController {
   }
 
   @Patch('content/:contentId')
-  @UseGuards(JwtAuthGuard, AdminAuthGuard)
+  @UseGuards(JwtAuthGuard, InstructorAuthGuard)
   async updateContent(
     @Param('contentId', ParseIntPipe) contentId: number,
     @Body() dto: UpdateContentDto,
@@ -108,14 +108,14 @@ export class LectureContentController {
   }
 
   @Delete('content/:contentId')
-  @UseGuards(JwtAuthGuard, AdminAuthGuard)
+  @UseGuards(JwtAuthGuard, InstructorAuthGuard)
   async deleteContent(@Param('contentId', ParseIntPipe) contentId: number) {
     await this.lectureContentService.deleteContent(contentId);
     return { message: 'Content deleted successfully' };
   }
 
   @Patch('weeks/:weekId/content/reorder')
-  @UseGuards(JwtAuthGuard, AdminAuthGuard)
+  @UseGuards(JwtAuthGuard, InstructorAuthGuard)
   async reorderContent(
     @Param('weekId', ParseIntPipe) weekId: number,
     @Body() dto: ReorderContentDto,
@@ -125,7 +125,7 @@ export class LectureContentController {
 
   // ============ FILE UPLOAD ============
   @Post('content/upload')
-  @UseGuards(JwtAuthGuard, AdminAuthGuard)
+  @UseGuards(JwtAuthGuard, InstructorAuthGuard)
   async uploadFile(@Request() req: any) {
     const data = await req.file();
     const courseId = parseInt(data.fields.courseId?.value, 10);
