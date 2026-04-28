@@ -9,6 +9,7 @@ async function bootstrap() {
 
   const seederService = app.get(SeederService);
   await seederService.seed1000Students();
+  await seederService.seedProfessorsAndCourses();
 
   await app.close();
   console.log('Standalone seeder finished.');

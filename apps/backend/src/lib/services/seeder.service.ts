@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { User, UserRole } from '../../entities/user.entity';
 import { Student } from '../../entities/student.entity';
-import { Course } from '../../entities/course.entity';
+import { Course, Semester } from '../../entities/course.entity';
 import { Week } from '../../entities/week.entity';
 import { LectureContent, ContentType } from '../../entities/lecture-content.entity';
 import { ConfigService } from '@nestjs/config';
@@ -104,6 +104,7 @@ export class SeederService {
         password: hashedPassword,
         firstName: 'John',
         lastName: 'Student',
+        phoneNumber: '+201050789177',
         role: UserRole.STUDENT,
         isActive: true,
       });
@@ -315,6 +316,73 @@ export class SeederService {
       this.logger.log('✅ 1000 students seeding completed.');
     } catch (error) {
       this.logger.error('❌ Failed to seed 1000 students:', error.message);
+      throw error;
+    }
+  }
+
+  async seedProfessorsAndCourses(): Promise<void> {
+    this.logger.log('🌱 Starting to seed professors and 50 courses...');
+    try {
+      const existingCoursesCount = await this.coursesRepository.count();
+      if (existingCoursesCount >= 50) {
+        this.logger.log('Already found 50+ courses. Skipping seeding.');
+        return;
+      }
+
+      // Seed 5 Professors
+      const professors: User[] = [];
+      const hashedPassword = await bcrypt.hash('Professor123!', 12);
+      for (let i = 1; i <= 5; i++) {
+        const email = `professor${i}@modernacademy.edu`;
+        const existingProf = await this.usersRepository.findOne({ where: { email } });
+        if (existingProf) {
+          professors.push(existingProf);
+        } else {
+          const prof = this.usersRepository.create({
+            email,
+            password: hashedPassword,
+            firstName: `Prof${i}`,
+            lastName: `Instructor`,
+            role: UserRole.PROFESSOR,
+            isActive: true,
+          });
+          professors.push(prof);
+        }
+      }
+      const savedProfessors = await this.usersRepository.save(professors);
+      this.logger.log(`✅ Saved ${savedProfessors.length} professors.`);
+
+      // Seed exactly 50 Computer Science Courses
+      const csTopics = [
+        'Programming', 'Data Structures', 'Algorithms', 'Databases', 'Operating Systems',
+        'Computer Networks', 'Artificial Intelligence', 'Machine Learning', 'Software Engineering', 'Web Development'
+      ];
+      const courseBatch: Course[] = [];
+
+      for (let i = 0; i < 50; i++) {
+        const num = 101 + i;
+        const topic = csTopics[i % csTopics.length];
+        const profId = savedProfessors[Math.floor(Math.random() * savedProfessors.length)].id;
+        const semester = Math.random() > 0.5 ? Semester.SUMMER : Semester.WINTER;
+        courseBatch.push(
+          this.coursesRepository.create({
+            courseCode: `CS${num}`,
+            courseName: `${topic} Concepts ${num}`,
+            description: `This is a comprehensive course covering advanced topics in ${topic}.`,
+            creditHours: Math.floor(Math.random() * 3) + 2, // 2 to 4 credits
+            pricePerCredit: 500.0,
+            semester: semester,
+            isActive: true,
+            professorId: profId,
+          })
+        );
+      }
+
+      // Save courses in chunks
+      await this.coursesRepository.save(courseBatch, { chunk: 50 });
+      this.logger.log(`✅ Successfully saved ${courseBatch.length} courses.`);
+    } catch (error) {
+      this.logger.error('❌ Failed to seed professors and courses:', error.message);
       throw error;
     }
   }

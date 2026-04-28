@@ -5,6 +5,7 @@ import {
   MinLength,
   MaxLength,
   IsNumber,
+  IsOptional,
 } from 'class-validator';
 
 export class CreateStudentDto {
@@ -30,4 +31,8 @@ export class CreateStudentDto {
   @MinLength(6)
   @MaxLength(100)
   password: string;
+
+  @IsOptional()
+  @IsString()
+  phoneNumber?: string;
 }

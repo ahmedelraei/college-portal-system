@@ -16,6 +16,7 @@ const createStudentSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Please enter a valid email address"),
+  phoneNumber: z.string().optional(),
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")
@@ -52,6 +53,7 @@ export function AddStudentForm({ onSuccess }: AddStudentFormProps) {
         lastName: data.lastName,
         email: data.email,
         password: data.password,
+        phoneNumber: data.phoneNumber,
       });
 
       reset();
@@ -135,6 +137,22 @@ export function AddStudentForm({ onSuccess }: AddStudentFormProps) {
         />
         {errors.email && (
           <p className="text-sm text-destructive">{errors.email.message}</p>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="phoneNumber" className="text-sm font-medium">
+          Phone Number
+        </Label>
+        <Input
+          id="phoneNumber"
+          type="tel"
+          placeholder="+201234567890"
+          {...register("phoneNumber")}
+          disabled={isLoading}
+        />
+        {errors.phoneNumber && (
+          <p className="text-sm text-destructive">{errors.phoneNumber.message}</p>
         )}
       </div>
 

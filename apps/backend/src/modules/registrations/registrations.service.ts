@@ -259,7 +259,40 @@ export class RegistrationsService {
     }
 
     Object.assign(registration, updateRegistrationDto);
-    return this.registrationsRepository.save(registration);
+    const savedRegistration =
+      await this.registrationsRepository.save(registration);
+
+    // Send WhatsApp notification when a grade is assigned
+    if (updateRegistrationDto.grade) {
+      const fullRegistration = await this.registrationsRepository.findOne({
+        where: { id: savedRegistration.id },
+        relations: ['course', 'student', 'student.user'],
+      });
+
+      if (!fullRegistration) {
+        return savedRegistration;
+      }
+
+      const studentUser = fullRegistration.student?.user;
+      if (studentUser?.phoneNumber) {
+        this.whatsappService.sendGradeNotification({
+          phoneNumber: studentUser.phoneNumber,
+          studentName: studentUser.firstName,
+          courseName: fullRegistration.course.courseName,
+          courseCode: fullRegistration.course.courseCode,
+          grade: updateRegistrationDto.grade,
+          gradePoints: savedRegistration.gradePoints,
+        });
+      } else {
+        console.log(
+          `[update] No phone number for student ${registration.studentId} — skipping WhatsApp notification`,
+        );
+      }
+
+      return fullRegistration;
+    }
+
+    return savedRegistration;
   }
 
   async drop(id: number): Promise<Registration> {

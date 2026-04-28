@@ -25,7 +25,7 @@ export class AuthService {
   ) {}
 
   async register(createStudentDto: CreateStudentDto) {
-    const { studentId, email, password, firstName, lastName } =
+    const { studentId, email, password, firstName, lastName, phoneNumber } =
       createStudentDto;
 
     // Check if user already exists
@@ -55,6 +55,7 @@ export class AuthService {
       password: hashedPassword,
       firstName,
       lastName,
+      phoneNumber,
       role: UserRole.STUDENT,
     });
 

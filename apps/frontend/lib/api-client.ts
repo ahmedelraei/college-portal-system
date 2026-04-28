@@ -169,6 +169,7 @@ export const authApi = {
     lastName: string;
     email: string;
     password: string;
+    phoneNumber?: string;
   }) => {
     return apiRequest<User>("/auth/admin/students", {
       method: "POST",
