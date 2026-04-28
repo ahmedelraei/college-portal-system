@@ -16,6 +16,7 @@ import { Course } from '../../entities/course.entity';
 import { Student } from '../../entities/student.entity';
 import { CoursesService } from '../courses/courses.service';
 import { StudentsService } from '../students/students.service';
+import { WhatsappService } from '../whatsapp/whatsapp.service';
 import { SystemSettingsService } from '../system-settings/system-settings.service';
 import { CreateRegistrationDto } from './dto/create-registration.dto';
 import { UpdateRegistrationDto } from './dto/update-registration.dto';
@@ -33,6 +34,7 @@ export class RegistrationsService {
     private coursesService: CoursesService,
     private studentsService: StudentsService,
     private systemSettingsService: SystemSettingsService,
+    private whatsappService: WhatsappService,
   ) {}
 
   async create(
@@ -363,6 +365,23 @@ export class RegistrationsService {
 
     if (!reloadedRegistration) {
       throw new NotFoundException('Registration not found after update');
+    }
+
+    // Send WhatsApp notification to student (fire-and-forget)
+    const studentUser = reloadedRegistration.student?.user;
+    if (studentUser?.phoneNumber) {
+      this.whatsappService.sendGradeNotification({
+        phoneNumber: studentUser.phoneNumber,
+        studentName: studentUser.firstName,
+        courseName: reloadedRegistration.course.courseName,
+        courseCode: reloadedRegistration.course.courseCode,
+        grade: grade,
+        gradePoints: reloadedRegistration.gradePoints,
+      });
+    } else {
+      console.log(
+        `[assignGrade] No phone number for student ${registration.studentId} — skipping WhatsApp notification`,
+      );
     }
 
     return reloadedRegistration;

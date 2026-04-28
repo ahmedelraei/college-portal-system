@@ -5,19 +5,51 @@
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:8080" },
-    { "key": "token", "value": "" },
-    { "key": "studentId", "value": "1" },
-    { "key": "courseId", "value": "1" },
-    { "key": "registrationId", "value": "1" },
-    { "key": "paymentId", "value": "1" },
-    { "key": "weekId", "value": "1" },
-    { "key": "contentId", "value": "1" }
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "studentId",
+      "value": "1"
+    },
+    {
+      "key": "courseId",
+      "value": "1"
+    },
+    {
+      "key": "registrationId",
+      "value": "1"
+    },
+    {
+      "key": "paymentId",
+      "value": "1"
+    },
+    {
+      "key": "weekId",
+      "value": "1"
+    },
+    {
+      "key": "contentId",
+      "value": "1"
+    },
+    {
+      "key": "professorId",
+      "value": "1"
+    }
   ],
   "auth": {
     "type": "bearer",
     "bearer": [
-      { "key": "token", "value": "{{token}}", "type": "string" }
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
     ]
   },
   "item": [
@@ -27,7 +59,9 @@
         {
           "name": "Root",
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [],
             "url": "{{baseUrl}}/api",
@@ -37,7 +71,9 @@
         {
           "name": "Health Check",
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [],
             "url": "{{baseUrl}}/api/health",
@@ -52,9 +88,16 @@
         {
           "name": "Register (Student)",
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"studentId\": 10001,\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"password123\"\n}"
@@ -66,9 +109,16 @@
         {
           "name": "Login (Student)",
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"studentId\": 10001,\n  \"password\": \"password123\"\n}"
@@ -80,9 +130,16 @@
         {
           "name": "Admin Register",
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"studentId\": 0,\n  \"firstName\": \"Admin\",\n  \"lastName\": \"User\",\n  \"email\": \"admin@college.edu\",\n  \"password\": \"admin123\"\n}"
@@ -94,9 +151,16 @@
         {
           "name": "Admin Login",
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"admin@college.edu\",\n  \"password\": \"admin123\"\n}"
@@ -109,7 +173,12 @@
           "name": "Create Student (Admin)",
           "request": {
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"studentId\": 10002,\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Smith\",\n  \"email\": \"jane.smith@example.com\",\n  \"password\": \"password123\"\n}"
@@ -134,6 +203,100 @@
             "header": [],
             "url": "{{baseUrl}}/api/auth/logout",
             "description": "Logout (client should clear token). Requires JWT."
+          }
+        },
+        {
+          "name": "Professor Login",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"professor@college.edu\",\n  \"password\": \"prof123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/professor/login",
+            "description": "Professor login. Copy access_token to collection variable `token`."
+          }
+        },
+        {
+          "name": "Create Professor (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Dr. Alan\",\n  \"lastName\": \"Turing\",\n  \"email\": \"alan.turing@college.edu\",\n  \"password\": \"password123\",\n  \"department\": \"Computer Science\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/admin/professors",
+            "description": "Create a professor. Admin only."
+          }
+        },
+        {
+          "name": "Get All Professors (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/admin/professors?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "admin",
+                "professors"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "Alan",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get all professors with pagination. Admin only."
+          }
+        },
+        {
+          "name": "Update Professor (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"department\": \"Mathematics\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/admin/professors/{{professorId}}",
+            "description": "Update a professor. Admin only."
           }
         }
       ]
@@ -184,11 +347,24 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/students/me/gpa?semester=summer&year=2024",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "students", "me", "gpa"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "students",
+                "me",
+                "gpa"
+              ],
               "query": [
-                {"key": "semester", "value": "summer"},
-                {"key": "year", "value": "2024"}
+                {
+                  "key": "semester",
+                  "value": "summer"
+                },
+                {
+                  "key": "year",
+                  "value": "2024"
+                }
               ]
             },
             "description": "Get current semester GPA. Query: semester (summer|winter), year."
@@ -225,7 +401,12 @@
           "name": "Update My Profile",
           "request": {
             "method": "PATCH",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.updated@example.com\"\n}"
@@ -238,7 +419,12 @@
           "name": "Update Student (Admin)",
           "request": {
             "method": "PATCH",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Smith\",\n  \"email\": \"jane.updated@example.com\"\n}"
@@ -265,7 +451,12 @@
           "name": "Create Course (Admin)",
           "request": {
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"courseCode\": \"CS101\",\n  \"courseName\": \"Introduction to Programming\",\n  \"description\": \"Basic programming concepts\",\n  \"creditHours\": 3,\n  \"pricePerCredit\": 500,\n  \"semester\": \"summer\",\n  \"prerequisiteIds\": []\n}"
@@ -281,12 +472,29 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/courses?semester=summer&search=CS&creditHours=3",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "courses"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "courses"
+              ],
               "query": [
-                {"key": "semester", "value": "summer", "disabled": true},
-                {"key": "search", "value": "CS", "disabled": true},
-                {"key": "creditHours", "value": "3", "disabled": true}
+                {
+                  "key": "semester",
+                  "value": "summer",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "CS",
+                  "disabled": true
+                },
+                {
+                  "key": "creditHours",
+                  "value": "3",
+                  "disabled": true
+                }
               ]
             },
             "description": "List courses. Query: semester (summer|winter), search, creditHours (1-4)."
@@ -332,7 +540,12 @@
           "name": "Update Course (Admin)",
           "request": {
             "method": "PATCH",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"courseName\": \"Intro to Programming (Updated)\",\n  \"description\": \"Updated description\",\n  \"isActive\": true\n}"
@@ -359,7 +572,12 @@
           "name": "Create Registration",
           "request": {
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"studentId\": 1,\n  \"courseId\": 1,\n  \"semester\": \"summer\",\n  \"year\": 2024\n}"
@@ -372,7 +590,12 @@
           "name": "Bulk Register",
           "request": {
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"studentId\": 1,\n  \"courseIds\": [1, 2, 3],\n  \"semester\": \"summer\",\n  \"year\": 2024,\n  \"isPaid\": false\n}"
@@ -388,12 +611,29 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/registrations?studentId=1&semester=summer&year=2024",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "registrations"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "registrations"
+              ],
               "query": [
-                {"key": "studentId", "value": "1", "disabled": true},
-                {"key": "semester", "value": "summer", "disabled": true},
-                {"key": "year", "value": "2024", "disabled": true}
+                {
+                  "key": "studentId",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "semester",
+                  "value": "summer",
+                  "disabled": true
+                },
+                {
+                  "key": "year",
+                  "value": "2024",
+                  "disabled": true
+                }
               ]
             },
             "description": "List all registrations. Admin only. Optional: studentId, semester, year."
@@ -406,11 +646,25 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/registrations/me?semester=summer&year=2024",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "registrations", "me"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "registrations",
+                "me"
+              ],
               "query": [
-                {"key": "semester", "value": "summer", "disabled": true},
-                {"key": "year", "value": "2024", "disabled": true}
+                {
+                  "key": "semester",
+                  "value": "summer",
+                  "disabled": true
+                },
+                {
+                  "key": "year",
+                  "value": "2024",
+                  "disabled": true
+                }
               ]
             },
             "description": "Get current student's registrations."
@@ -432,11 +686,26 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/registrations/student/{{studentId}}?semester=summer&year=2024",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "registrations", "student", "{{studentId}}"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "registrations",
+                "student",
+                "{{studentId}}"
+              ],
               "query": [
-                {"key": "semester", "value": "summer", "disabled": true},
-                {"key": "year", "value": "2024", "disabled": true}
+                {
+                  "key": "semester",
+                  "value": "summer",
+                  "disabled": true
+                },
+                {
+                  "key": "year",
+                  "value": "2024",
+                  "disabled": true
+                }
               ]
             },
             "description": "Get registrations for a student. Admin only."
@@ -464,7 +733,12 @@
           "name": "Update Registration (Admin)",
           "request": {
             "method": "PATCH",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"paymentStatus\": \"paid\",\n  \"grade\": \"A\"\n}"
@@ -477,7 +751,12 @@
           "name": "Update Payment Status",
           "request": {
             "method": "PATCH",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"paymentStatus\": \"paid\"\n}"
@@ -504,7 +783,12 @@
           "name": "Create Payment",
           "request": {
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"studentId\": 1,\n  \"registrationIds\": [1, 2],\n  \"method\": \"credit_card\"\n}"
@@ -517,7 +801,12 @@
           "name": "Process Payment",
           "request": {
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"cardNumber\": \"4111111111111111\",\n  \"expiryDate\": \"12/25\",\n  \"cvv\": \"123\",\n  \"cardholderName\": \"John Doe\"\n}"
@@ -533,9 +822,20 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/payments?studentId=1",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "payments"],
-              "query": [{"key": "studentId", "value": "1", "disabled": true}]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payments"
+              ],
+              "query": [
+                {
+                  "key": "studentId",
+                  "value": "1",
+                  "disabled": true
+                }
+              ]
             },
             "description": "List all payments. Admin only. Optional: studentId."
           }
@@ -598,7 +898,12 @@
           "name": "Refund Payment (Admin)",
           "request": {
             "method": "PATCH",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"reason\": \"Student withdrawal\"\n}"
@@ -625,7 +930,12 @@
           "name": "Create Week (Admin)",
           "request": {
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"weekNumber\": 1,\n  \"title\": \"Week 1: Introduction\",\n  \"description\": \"Overview of the course\",\n  \"isPublished\": true\n}"
@@ -647,7 +957,12 @@
           "name": "Update Week (Admin)",
           "request": {
             "method": "PATCH",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"title\": \"Week 1: Introduction (Updated)\",\n  \"isPublished\": true\n}"
@@ -683,7 +998,12 @@
           "name": "Create Content (Admin)",
           "request": {
             "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"title\": \"Lecture 1\",\n  \"contentType\": \"video\",\n  \"externalUrl\": \"https://example.com/video\",\n  \"description\": \"Introduction video\",\n  \"displayOrder\": 0\n}"
@@ -705,7 +1025,12 @@
           "name": "Update Content (Admin)",
           "request": {
             "method": "PATCH",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"title\": \"Lecture 1 (Updated)\",\n  \"displayOrder\": 1\n}"
@@ -727,7 +1052,12 @@
           "name": "Reorder Content (Admin)",
           "request": {
             "method": "PATCH",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"items\": [\n    { \"id\": 1, \"displayOrder\": 0 },\n    { \"id\": 2, \"displayOrder\": 1 }\n  ]\n}"
@@ -744,9 +1074,21 @@
             "body": {
               "mode": "formdata",
               "formdata": [
-                {"key": "courseId", "value": "{{courseId}}", "type": "text"},
-                {"key": "weekId", "value": "{{weekId}}", "type": "text"},
-                {"key": "file", "type": "file", "src": []}
+                {
+                  "key": "courseId",
+                  "value": "{{courseId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "weekId",
+                  "value": "{{weekId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
               ]
             },
             "url": "{{baseUrl}}/api/content/upload",
@@ -802,7 +1144,9 @@
         {
           "name": "Is Registration Enabled",
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [],
             "url": "{{baseUrl}}/api/system-settings/registration-enabled",
@@ -822,7 +1166,12 @@
           "name": "Toggle Registration (Admin)",
           "request": {
             "method": "PATCH",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"enabled\": true\n}"
@@ -835,13 +1184,41 @@
           "name": "Update System Setting (Admin)",
           "request": {
             "method": "PATCH",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"settingKey\": \"registration_enabled\",\n  \"settingValue\": \"true\"\n}"
             },
             "url": "{{baseUrl}}/api/system-settings",
             "description": "Update a system setting by key. Admin only."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Chatbot",
+      "item": [
+        {
+          "name": "Ask Chatbot",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseId\": 1,\n  \"message\": \"What is the main topic of week 1?\"\n}"
+            },
+            "url": "{{baseUrl}}/api/students/chatbot/ask",
+            "description": "Ask the chatbot a question related to a course. Requires student JWT."
           }
         }
       ]

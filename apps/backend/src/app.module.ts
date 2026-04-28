@@ -11,6 +11,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
 import { SystemSettingsModule } from './modules/system-settings/system-settings.module';
 import { LectureContentModule } from './modules/lecture-content/lecture-content.module';
 import { ChatbotModule } from './modules/chatbot/chatbot.module';
+import { WhatsappModule } from './modules/whatsapp/whatsapp.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ChatbotModule } from './modules/chatbot/chatbot.module';
     SystemSettingsModule,
     LectureContentModule,
     ChatbotModule,
+    WhatsappModule,
   ],
   controllers: [AppController],
   providers: [AppService],

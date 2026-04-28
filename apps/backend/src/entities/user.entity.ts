@@ -39,6 +39,9 @@ export class User {
   })
   role: UserRole;
 
+  @Column({ nullable: true })
+  phoneNumber: string; // International format for WhatsApp, e.g. "201234567890"
+
   @Column({ default: true })
   isActive: boolean;
 
