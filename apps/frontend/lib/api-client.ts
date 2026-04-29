@@ -432,9 +432,9 @@ export const lectureContentApi = {
   // File upload
   uploadFile: async (file: File, courseId: number, weekId: number) => {
     const formData = new FormData();
-    formData.append("file", file);
     formData.append("courseId", courseId.toString());
     formData.append("weekId", weekId.toString());
+    formData.append("file", file);
 
     const token = getStoredToken();
     const response = await fetch(`${API_URL}/content/upload`, {
