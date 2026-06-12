@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Circle, ExternalLink, FileText, Video, BookOpen, FileCheck } from "lucide-react";
+import { getFileUrl } from "@/lib/api-client";
 import type { LectureContent } from "@/lib/api-types";
 
 interface ContentItemProps {
@@ -72,7 +73,7 @@ export function ContentItem({ content, onToggleComplete }: ContentItemProps) {
               )}
               {content.fileUrl && (
                 <a
-                  href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}${content.fileUrl}`}
+                  href={getFileUrl(content.fileUrl)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-sm text-primary hover:underline"

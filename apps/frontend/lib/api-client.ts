@@ -13,7 +13,11 @@ import type {
 
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8080/api";
+// Static files (uploads) are served from the app root, not under the /api prefix
+const SERVER_URL = API_URL.replace(/\/api\/?$/, "");
 const TOKEN_STORAGE_KEY = "college-portal-token";
+
+export const getFileUrl = (fileUrl: string) => `${SERVER_URL}${fileUrl}`;
 
 let authToken: string | null = null;
 
